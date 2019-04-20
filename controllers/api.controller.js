@@ -39,7 +39,7 @@ module.exports.userDashboardView = (req, res) => {
 
 module.exports.pendingQuestionView = (req, res) => {
   let perPage = 10,
-    page = Math.max(0, req.params.page);
+    currentPage = Math.max(0, req.params.page);
 
   Question.countDocuments({ isApproved: false }, (err, c) => {
     if (err) return console.log(err);
@@ -49,18 +49,18 @@ module.exports.pendingQuestionView = (req, res) => {
       Question.find({ isApproved: false })
         .populate("answers", "answerText")
         .limit(perPage)
-        .skip(perPage * (page - 1))
+        .skip(perPage * (currentPage - 1))
         .sort({ field: "asc", _id: -1 })
         .exec((err, newestQuestions) => {
           if (err) return console.log(err);
 
-          generatePageButtons(c, questionsPerPage, numberOfButtonsPerPage, page, pages => {
+          generatePageButtons(c, questionsPerPage, numberOfButtonsPerPage, currentPage, pages => {
             res.render("question_pending", {
               user: req.user,
               style: "style.css",
               newestQuestions,
               pages,
-              page
+              page: currentPage
             });
           });
         });
@@ -75,7 +75,7 @@ module.exports.pendingQuestionView = (req, res) => {
 
 module.exports.poolQuestionView = (req, res) => {
   let perPage = 10,
-    page = Math.max(0, req.params.page);
+    currentPage = Math.max(0, req.params.page);
 
   Question.countDocuments({ isApproved: true }, (err, c) => {
     if (err) return console.log(err);
@@ -84,18 +84,18 @@ module.exports.poolQuestionView = (req, res) => {
       Question.find({ isApproved: true })
         .populate("answers", "answerText")
         .limit(perPage)
-        .skip(perPage * (page - 1))
+        .skip(perPage * (currentPage - 1))
         .sort({ field: "asc", _id: -1 })
         .exec((err, approvedQuestions) => {
           if (err) return console.log(err);
 
-          generatePageButtons(c, questionsPerPage, numberOfButtonsPerPage, page, pages => {
+          generatePageButtons(c, questionsPerPage, numberOfButtonsPerPage, currentPage, pages => {
             res.render("question_pool", {
               user: req.user,
               style: "style.css",
               approvedQuestions,
               pages,
-              page
+              page: currentPage
             });
           });
         });
@@ -110,7 +110,7 @@ module.exports.poolQuestionView = (req, res) => {
 
 module.exports.reportQuestionView = (req, res) => {
   let perPage = 10,
-    page = Math.max(0, req.params.page);
+    currentPage = Math.max(0, req.params.page);
 
   Question.countDocuments({ isReported: true }, (err, c) => {
     if (err) return console.log(err);
@@ -119,18 +119,18 @@ module.exports.reportQuestionView = (req, res) => {
       Question.find({ isReported: true })
         .populate("answers", "answerText")
         .limit(perPage)
-        .skip(perPage * (page - 1))
+        .skip(perPage * (currentPage - 1))
         .sort({ field: "asc", _id: -1 })
         .exec((err, reportedQuestions) => {
           if (err) return console.log(err);
 
-          generatePageButtons(c, questionsPerPage, numberOfButtonsPerPage, page, pages => {
+          generatePageButtons(c, questionsPerPage, numberOfButtonsPerPage, currentPage, pages => {
             res.render("question_reported", {
               user: req.user,
               style: "style.css",
               reportedQuestions,
               pages,
-              page
+              page: currentPage
             });
           });
         });
