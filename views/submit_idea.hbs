@@ -1,0 +1,19 @@
+<div>
+    {{>nav }}
+</div>
+<div class="container mt-5">
+    <div class="mb-5">
+        {{>messages }}
+    </div>
+    <form action="/api/submit" method="POST">
+        <div class="form-group">
+            <label for="exampleFormControlInput1">Let me know how can I contact you</label>
+            <input type="email" class="form-control" name="email" placeholder="name@example.com" required>
+        </div>
+        <div class="form-group">
+            <label for="exampleFormControlTextarea1">Email body</label>
+            <textarea class="form-control" name="body" rows="6" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Send email</button>
+    </form>
+</div>

@@ -1,0 +1,56 @@
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-5 mx-auto">
+            <div id="second">
+                <div class="myform form ">
+                    <div class="logo mb-3">
+                        <div class="col-md-12 text-center">
+                            <h1>Signup</h1>
+                        </div>
+                        {{> messages }}
+                    </div>
+                    <form action="/user/register" method="POST" name="registration">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">First Name</label>
+                            <input type="text" name="firstname" class="form-control" id="firstname" aria-describedby="emailHelp"
+                                placeholder="Enter Firstname" {{#if firstname}} value={{firstname}} {{else}} value=''
+                                {{/if}}>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Last Name</label>
+                            <input type="text" name="lastname" class="form-control" id="lastname" aria-describedby="emailHelp"
+                                placeholder="Enter Lastname" {{#if lastname}} value={{lastname}} {{else}} value=''
+                                {{/if}}>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Email address</label>
+                            <input type="email" name="email" class="form-control" id="email" aria-describedby="emailHelp"
+                                placeholder="Enter email" {{#if email}} value={{email}} {{else}} value='' {{/if}}>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Password</label>
+                            <input type="password" name="password" id="password" class="form-control" aria-describedby="emailHelp"
+                                placeholder="Enter Password" {{#if password}} value={{password}} {{else}} value=''
+                                {{/if}}>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Confirm password</label>
+                            <input type="password" name="password2" id="password2" class="form-control"
+                                aria-describedby="emailHelp" placeholder="Enter Password Again" {{#if password2}} value={{password2}}
+                                {{else}} value='' {{/if}}>
+                        </div>
+                        <div class="col-md-12 text-center mb-3">
+                            <button type="submit" class=" btn btn-block mybtn btn-primary tx-tfm">Get Started For
+                                Free</button>
+                        </div>
+                        <div class="col-md-12 ">
+                            <div class="form-group">
+                                <p class="text-center"><a href="/user/login" id="signin">Already have an account?</a></p>
+                            </div>
+                        </div>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

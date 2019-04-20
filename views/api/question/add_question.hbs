@@ -1,0 +1,78 @@
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12 mx-auto">
+            <div id="second">
+                <div class="myform form">
+                    <div class="logo mb-3">
+                        <div class="text-center">
+                            <h1>Add a new question</h1>
+                        </div>
+                        {{> messages }}
+                    </div>
+                    <form action="/api/question" method="POST" name="registration">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Question body</label>
+                            <input type="text" name="questionBody" class="form-control" id="questionBody"
+                                aria-describedby="questionBody" placeholder="Enter question body" {{#if questionBody}}
+                                value={{questionBody}} {{else}} value='' {{/if}}>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Question type</label>
+                            <input type="text" name="questionCategory" class="form-control" id="questionCategory"
+                                aria-describedby="questionCategory" placeholder="Enter question type"
+                                {{#if questionCategory}} value={{questionCategory}} {{else}} value='' {{/if}}>
+                        </div>
+                        <div class="form-inline">
+                            <div class="col-md-12 form-group">
+                                <label class="col-form-label col-md-4" for="name">First answer</label>
+                                <input type="text" name="answer1" class="form-control col-md-4" id="answer1"
+                                    aria-describedby="questionBody" placeholder="Enter first answer" {{#if answer1}}
+                                    value={{answer1}} {{else}} value='' {{/if}}>
+                                <input type="checkbox" class="form-control col-md-4" name="isCorrect" id="correct1"
+                                    value="1">
+                            </div>
+                        </div>
+
+                        <div class="form-inline">
+                            <div class="col-md-12 form-group">
+                                <label class="col-form-label col-md-4 text-center" for="name">Second answer</label>
+                                <input type="text" name="answer2" class="form-control col-md-4" id="answer2"
+                                    aria-describedby="questionBody" placeholder="Enter second answer" {{#if answer2}}
+                                    value={{answer2}} {{else}} value='' {{/if}}>
+                                <input type="checkbox" class="form-control col-md-4" name="isCorrect" id="correct2"
+                                    value="2">
+                            </div>
+                        </div>
+
+                        <div class="form-inline">
+                            <div class="col-md-12 form-group">
+                                <label class="col-form-label col-md-4 text-center" for="name">Third answer</label>
+                                <input type="text" name="answer3" class="form-control col-md-4" id="answer3"
+                                    aria-describedby="questionBody" placeholder="Enter third answer" {{#if answer3}}
+                                    value={{answer3}} {{else}} value='' {{/if}}>
+                                <input type="checkbox" class="form-control col-md-4" name="isCorrect" id="correct3"
+                                    value="3">
+                            </div>
+                        </div>
+
+                        <div class="form-inline">
+                            <div class="col-md-12 form-group">
+                                <label class="col-form-label col-md-4 text-center" for="name">Fourth answer</label>
+                                <input type="text" name="answer4" class="form-control col-md-4" id="answer4"
+                                    aria-describedby="questionBody" placeholder="Enter second answer" {{#if answer4}}
+                                    value={{answer4}} {{else}} value='' {{/if}}>
+                                <input type="checkbox" class="form-control col-md-4" name="isCorrect" id="correct4"
+                                    value="4">
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 text-center mt-3">
+                            <button type="submit" class="btn btn-block mybtn btn-primary tx-tfm">Submit
+                                question</button>
+                        </div>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
