@@ -45,7 +45,6 @@ module.exports.pendingQuestionView = (req, res) => {
     if (err) return console.log(err);
 
     if (c) {
-      console.log(c);
       Question.find({ isApproved: false })
         .populate("answers", "answerText")
         .limit(perPage)
@@ -73,7 +72,7 @@ module.exports.pendingQuestionView = (req, res) => {
   });
 };
 
-module.exports.poolQuestionView = (req, res) => {
+module.exports.poolQuestionView = (req, res, next) => {
   let perPage = 10,
     currentPage = Math.max(0, req.params.page);
 

@@ -11,7 +11,7 @@ router.get("/test", (req, res) => {
   let answerArray = [];
 
   let i;
-  for (i = 0; i < 10; i++) {
+  for (i = 0; i < 5; i++) {
     answerArray.push({ answerText: faker.lorem.word(), isCorrect: false });
     answerArray.push({ answerText: faker.lorem.word(), isCorrect: false });
     answerArray.push({ answerText: faker.lorem.word(), isCorrect: true });
@@ -21,7 +21,8 @@ router.get("/test", (req, res) => {
       let newQuestion = new Question({
         questionBody: faker.lorem.sentence(),
         questionCategory: faker.lorem.word(),
-        answers
+        answers,
+        isReported: true
       });
 
       newQuestion
