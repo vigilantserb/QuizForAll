@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 module.exports = {
   generatePasswordResetPage: function(email) {
     let token = jwt.sign({ email: email }, require("../config/keys").secret, {
-      expiresIn: 10
+      expiresIn: 3600
     });
     let link = `http://localhost:3000/user/reset_password/${token}`;
 
