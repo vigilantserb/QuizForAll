@@ -8,7 +8,7 @@ let refreshTokens = {};
 const config = require("../config/keys");
 let { generatePlayerConfirmationPage } = require("../api/utils");
 
-module.exports.playerRegister = (req, res) => {
+module.exports.playerRegister = (req, res, next) => {
   let { username, email, password, password2 } = req.body;
 
   if (!username || !email || !password || !password2) {
@@ -24,7 +24,6 @@ module.exports.playerRegister = (req, res) => {
   }
 
   Player.find({ email: email }).then(player => {
-    console.log(player);
     if (player.length !== 0) return res.status(400).send({ message: "Email taken." });
     else {
       Player.find({ username: username }).then(player => {
@@ -37,17 +36,17 @@ module.exports.playerRegister = (req, res) => {
           });
 
           bcrypt.genSalt(10, (err, salt) => {
+            if (err) next(err);
             bcrypt.hash(newPlayer.password, salt, (err, hash) => {
-              if (err) throw err;
+              if (err) next(err);
               newPlayer.password = hash;
               newPlayer
                 .save()
                 .then(player => {
-                  console.log(player);
                   generatePlayerConfirmationPage(player.email);
                   return res.status(201).send({ message: "Registration successful. Verification email sent." });
                 })
-                .catch(err => console.log(err));
+                .catch(err => next(err));
             });
           });
         }
@@ -73,7 +72,7 @@ module.exports.playerRefreshAccessToken = (req, res) => {
   }
 };
 
-module.exports.playerLogin = (req, res) => {
+module.exports.playerLogin = (req, res, next) => {
   let { username, password } = req.body;
 
   if (!username || !password) {
@@ -81,7 +80,7 @@ module.exports.playerLogin = (req, res) => {
   }
 
   Player.findOne({ username: username }, "username password isVerified", (err, player) => {
-    if (err) console.log(err);
+    if (err) return next(err);
 
     if (!player) {
       return res.status(404).send({ message: "Player not found." });
@@ -113,7 +112,7 @@ module.exports.playerLogin = (req, res) => {
   });
 };
 
-module.exports.playerVerifyAccount = (req, res) => {
+module.exports.playerVerifyAccount = (req, res, next) => {
   let { token } = req.params;
 
   if (!token) {
@@ -121,11 +120,11 @@ module.exports.playerVerifyAccount = (req, res) => {
   }
 
   jwt.verify(token, require("../config/keys").secret, function(err, decoded) {
+    if (err) return next(err);
     if (!decoded) {
       res.status(500).send({ message: "Access token expired. Try again." });
     } else {
       Player.findOneAndUpdate({ email: decoded.email }, { isVerified: true }).then(user => {
-        console.log(user);
         res.status(200).send({ message: "Account confirmation successful." });
       });
     }

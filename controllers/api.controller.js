@@ -37,12 +37,12 @@ module.exports.userDashboardView = (req, res) => {
   });
 };
 
-module.exports.pendingQuestionView = (req, res) => {
+module.exports.pendingQuestionView = (req, res, next) => {
   let perPage = 10,
     currentPage = Math.max(0, req.params.page);
 
   Question.countDocuments({ isApproved: false }, (err, c) => {
-    if (err) return console.log(err);
+    if (err) return next(err);
 
     if (c) {
       Question.find({ isApproved: false })
@@ -51,7 +51,7 @@ module.exports.pendingQuestionView = (req, res) => {
         .skip(perPage * (currentPage - 1))
         .sort({ field: "asc", _id: -1 })
         .exec((err, newestQuestions) => {
-          if (err) return console.log(err);
+          if (err) return next(err);
 
           generatePageButtons(c, questionsPerPage, numberOfButtonsPerPage, currentPage, pages => {
             res.render("question_pending", {
@@ -77,7 +77,7 @@ module.exports.poolQuestionView = (req, res, next) => {
     currentPage = Math.max(0, req.params.page);
 
   Question.countDocuments({ isApproved: true }, (err, c) => {
-    if (err) return console.log(err);
+    if (err) return next(err);
 
     if (c) {
       Question.find({ isApproved: true })
@@ -86,7 +86,7 @@ module.exports.poolQuestionView = (req, res, next) => {
         .skip(perPage * (currentPage - 1))
         .sort({ field: "asc", _id: -1 })
         .exec((err, approvedQuestions) => {
-          if (err) return console.log(err);
+          if (err) return next(err);
 
           generatePageButtons(c, questionsPerPage, numberOfButtonsPerPage, currentPage, pages => {
             res.render("question_pool", {
@@ -107,12 +107,12 @@ module.exports.poolQuestionView = (req, res, next) => {
   });
 };
 
-module.exports.reportQuestionView = (req, res) => {
+module.exports.reportQuestionView = (req, res, next) => {
   let perPage = 10,
     currentPage = Math.max(0, req.params.page);
 
   Question.countDocuments({ isReported: true }, (err, c) => {
-    if (err) return console.log(err);
+    if (err) return next(err);
 
     if (c) {
       Question.find({ isReported: true })
@@ -121,7 +121,7 @@ module.exports.reportQuestionView = (req, res) => {
         .skip(perPage * (currentPage - 1))
         .sort({ field: "asc", _id: -1 })
         .exec((err, reportedQuestions) => {
-          if (err) return console.log(err);
+          if (err) return next(err);
 
           generatePageButtons(c, questionsPerPage, numberOfButtonsPerPage, currentPage, pages => {
             res.render("question_reported", {
@@ -142,24 +142,24 @@ module.exports.reportQuestionView = (req, res) => {
   });
 };
 
-module.exports.questionDashboardView = (req, res) => {
+module.exports.questionDashboardView = (req, res, next) => {
   Question.find({ isApproved: false })
     .sort({ field: "asc", _id: -1 })
     .limit(5)
     .exec((err, newestQuestions) => {
-      if (err) return console.log(err);
+      if (err) return next(err);
 
       Question.find({ isApproved: true })
         .sort({ field: "asc", _id: -1 })
         .limit(5)
         .exec((err, approvedQuestions) => {
-          if (err) return console.log(err);
+          if (err) return next(err);
 
           Question.find({ isReported: true })
             .sort({ field: "asc", _id: -1 })
             .limit(5)
             .exec((err, reportedQuestions) => {
-              if (err) return console.log(err);
+              if (err) return next(err);
 
               res.render("question_dashboard", {
                 newestQuestions,
@@ -174,46 +174,54 @@ module.exports.questionDashboardView = (req, res) => {
 
 /* Buttons */
 
-module.exports.deleteQuestionButton = (req, res) => {
-  Question.deleteOne({ _id: req.params.id }).then(() => {
-    req.flash("success_msg", "Question successfully deleted");
-    res.redirect(`/api/question/${req.params.type}/${req.params.page}`);
-  });
+module.exports.deleteQuestionButton = (req, res, next) => {
+  Question.deleteOne({ _id: req.params.id })
+    .then(() => {
+      req.flash("success_msg", "Question successfully deleted");
+      res.redirect(`/api/question/${req.params.type}/${req.params.page}`);
+    })
+    .catch(err => next(err));
 };
 
-module.exports.editQuestionButton = (req, res) => {
-  Question.findOne({ _id: req.params.id }).then(() => {
-    req.flash("error_msg", "Functionality in development.");
-    res.redirect(`/api/question/${req.params.type}/${req.params.page}`);
-  });
+module.exports.editQuestionButton = (req, res, next) => {
+  Question.findOne({ _id: req.params.id })
+    .then(() => {
+      req.flash("error_msg", "Functionality in development.");
+      res.redirect(`/api/question/${req.params.type}/${req.params.page}`);
+    })
+    .catch(err => next(err));
 };
 
-module.exports.approveQuestionButton = (req, res) => {
-  Question.findOneAndUpdate({ _id: req.params.id }, { isApproved: true, lastEdited: Date.now() }).then(question => {
-    req.flash("success_msg", "Question successfully approved.");
-    console.log("succ");
-    res.redirect(`/api/question/${req.params.type}/${req.params.page}`);
-  });
+module.exports.approveQuestionButton = (req, res, next) => {
+  Question.findOneAndUpdate({ _id: req.params.id }, { isApproved: true, lastEdited: Date.now() })
+    .then(question => {
+      req.flash("success_msg", "Question successfully approved.");
+      res.redirect(`/api/question/${req.params.type}/${req.params.page}`);
+    })
+    .catch(err => next(err));
 };
 
-module.exports.unapproveQuestionButton = (req, res) => {
-  Question.findOneAndUpdate({ _id: req.params.id }, { isApproved: false, lastEdited: Date.now() }).then(question => {
-    req.flash("success_msg", "Question successfully unapproved.");
-    res.redirect(`/api/question/${req.params.type}/${req.params.page}`);
-  });
+module.exports.unapproveQuestionButton = (req, res, next) => {
+  Question.findOneAndUpdate({ _id: req.params.id }, { isApproved: false, lastEdited: Date.now() })
+    .then(question => {
+      req.flash("success_msg", "Question successfully unapproved.");
+      res.redirect(`/api/question/${req.params.type}/${req.params.page}`);
+    })
+    .catch(err => next(err));
 };
 
-module.exports.reviewQuestionButton = (req, res) => {
-  Question.findOneAndUpdate({ _id: req.params.id }, { isReported: false, lastEdited: Date.now() }).then(question => {
-    console.log(question);
-    req.flash("success_msg", "Question successfully reviewed and added back into the pool.");
-    res.redirect(`/api/question/${req.params.type}/${req.params.page}`);
-  });
+module.exports.reviewQuestionButton = (req, res, next) => {
+  Question.findOneAndUpdate({ _id: req.params.id }, { isReported: false, lastEdited: Date.now() })
+    .then(question => {
+      req.flash("success_msg", "Question successfully reviewed and added back into the pool.");
+      res.redirect(`/api/question/${req.params.type}/${req.params.page}`);
+    })
+    .catch(err => next(err));
 };
 
 /* Mongoose */
 
-module.exports.addQuestionMongoose = (req, res) => {
+module.exports.addQuestionMongoose = (req, res, next) => {
   let { questionBody, questionCategory, isCorrect, answer1, answer2, answer3, answer4 } = req.body;
   let errors = [];
 
@@ -259,25 +267,27 @@ module.exports.addQuestionMongoose = (req, res) => {
     answerArray.push({ answerText: answer3, isCorrect: isCorrectArray[2] });
     answerArray.push({ answerText: answer4, isCorrect: isCorrectArray[3] });
 
-    Answer.insertMany(answerArray).then(answers => {
-      let newQuestion = new Question({
-        questionBody,
-        questionCategory,
-        answers
-      });
+    Answer.insertMany(answerArray)
+      .then(answers => {
+        let newQuestion = new Question({
+          questionBody,
+          questionCategory,
+          answers
+        });
 
-      newQuestion
-        .save()
-        .then(question => {
-          req.flash("success_msg", "Question submitted successfully.");
-          res.redirect("/dashboard");
-        })
-        .catch(err => console.log(err));
-    });
+        newQuestion
+          .save()
+          .then(question => {
+            req.flash("success_msg", "Question submitted successfully.");
+            res.redirect("/dashboard");
+          })
+          .catch(err => next(err));
+      })
+      .catch(err => next(err));
   }
 };
 
-module.exports.submitIdeaEmail = (req, res) => {
+module.exports.submitIdeaEmail = (req, res, next) => {
   let { email, body } = req.body;
   let transporter = nodemailer.createTransport({
     service: "gmail",
@@ -293,7 +303,7 @@ module.exports.submitIdeaEmail = (req, res) => {
     html: `Email sender - ${email}. Submition body - ${body}`
   };
   transporter.sendMail(mailOptions, function(err, info) {
-    if (err) console.log(err);
+    if (err) return next(err);
     else {
       req.flash("success_msg", "Question submitted successfully.");
       res.redirect("/api/submit");
