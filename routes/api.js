@@ -21,9 +21,7 @@ router.get("/test", (req, res) => {
       let newQuestion = new Question({
         questionBody: faker.lorem.sentence(),
         questionCategory: faker.lorem.word(),
-        answers,
-        isReported: true,
-        isApproved: false
+        answers
       });
 
       newQuestion
