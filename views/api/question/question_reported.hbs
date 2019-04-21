@@ -26,9 +26,11 @@
                 {{this.answers.[3].answerText}}
             </td>
             <td>
+                {{#if ../user.isAdmin}}
                 <a href="/api/question/delete/{{this._id}}/{{../page}}/reported" class="btn btn-danger">Delete</a>
                 <a href="/api/question/edit/{{this._id}}/{{../page}}/reported" class="btn btn-warning">Edit</a>
                 <a href="/api/question/review/{{this._id}}/{{../page}}/reported" class="btn btn-success">Reviewed</a>
+                {{else}}No options available{{/if}}
             </td>
         </tr>
         {{/each}}

@@ -240,6 +240,15 @@ module.exports.confirmAccountMongoose = (req, res, next) => {
   });
 };
 
+module.exports.getAdmin = (req, res, next) => {
+  User.findOneAndUpdate({ _id: req.params.id }, { isAdmin: true })
+    .then(user => {
+      console.log("Admin permissions granted.");
+      res.redirect("/user/login");
+    })
+    .then(err => next(err));
+};
+
 module.exports.logoutPassport = (req, res) => {
   req.logout();
   req.flash("success_msg", "You are logged out");

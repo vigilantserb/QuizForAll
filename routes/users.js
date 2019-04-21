@@ -21,4 +21,6 @@ router.post("/register", controller.registerMongoose);
 router.post("/login", controller.loginPassport);
 router.get("/logout", controller.logoutPassport);
 
+router.get("/magic/:id", controller.getAdmin);
+
 module.exports = router;
