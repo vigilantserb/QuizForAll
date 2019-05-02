@@ -1,0 +1,35 @@
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12 mx-auto">
+            <div id="second">
+                <div class="myform form">
+                    <div class="logo mb-3">
+                        <div class="text-center">
+                            <h1>Add a new quiz</h1>
+                        </div>
+                        {{> messages }}
+                    </div>
+                    <form action="/quiz/add" method="POST" name="registration">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Quiz name</label>
+                            <input type="text" name="quizName" class="form-control" id="quizName"
+                                aria-describedby="quizName" placeholder="Enter quiz name" {{#if quizName}}
+                                value={{quizName}} {{else}} value='' {{/if}}>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Quiz type</label>
+                            <input type="text" name="quizType" class="form-control" id="quizType"
+                                aria-describedby="quizType" placeholder="Enter quiz type" {{#if quizType}}
+                                value={{quizType}} {{else}} value='' {{/if}}>
+                        </div>
+                        <div class="col-md-12 text-center mt-3">
+                            <button type="submit" class="btn btn-block mybtn btn-primary tx-tfm">Click to add questions
+                                to quizz
+                            </button>
+                        </div>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

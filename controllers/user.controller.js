@@ -187,6 +187,10 @@ module.exports.loginPassport = (req, res, next) => {
       let errors = [];
       if (!user) {
         errors.push({ msg: "No user with that email found" });
+        return res.render("login", {
+          style: "style.css",
+          errors
+        });
       }
 
       bcrypt.compare(password, user.password, (err, isMatch) => {

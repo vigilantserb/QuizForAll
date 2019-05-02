@@ -38,7 +38,6 @@ module.exports.userDashboardView = (req, res) => {
 };
 
 module.exports.pendingQuestionView = (req, res, next) => {
-  console.log(req.user.isAdmin);
   let perPage = 10,
     currentPage = Math.max(0, req.params.page);
 

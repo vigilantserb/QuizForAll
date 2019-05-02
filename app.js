@@ -47,7 +47,7 @@ app.use(function(req, res, next) {
   next();
 });
 
-app.set("views", [path.join(__dirname, "views"), path.join(__dirname, "/views/api/question"), path.join(__dirname, "/views/api/player")]);
+app.set("views", [path.join(__dirname, "views"), path.join(__dirname, "/views/api/question"), path.join(__dirname, "/views/api/player"), path.join(__dirname, "/views/api/quiz")]);
 app.set("view engine", "hbs");
 hbs.registerPartials(__dirname + "/views/partials");
 
@@ -64,6 +64,7 @@ app.use("/", require("./routes/index"));
 app.use("/user", require("./routes/users"));
 app.use("/api", require("./routes/api"));
 app.use("/player", require("./routes/player"));
+app.use("/quiz", require("./routes/quiz"));
 
 app.use(function(req, res, next) {
   next(createError(404));
