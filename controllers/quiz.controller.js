@@ -37,7 +37,7 @@ module.exports.addQuestionsToQuizView = (req, res, next) => {
         if (err) return next(err);
 
         if (c) {
-          Question.find({ isApproved: true, isReported: false })
+          Question.find({ isApproved: true })
             .populate("answers", "answerText")
             .limit(perPage)
             .skip(perPage * (currentPage - 1))
@@ -70,6 +70,38 @@ module.exports.addQuestionsToQuizView = (req, res, next) => {
           });
         }
       });
+    });
+};
+
+module.exports.quizDashboardView = (req, res, next) => {
+  Quiz.find({ isApproved: false })
+    .sort({ field: "asc", _id: -1 })
+    .limit(5)
+    .exec((err, newestQuizzes) => {
+      if (err) return next(err);
+
+      Quiz.find({ isApproved: true })
+        .sort({ field: "asc", _id: -1 })
+        .limit(5)
+        .exec((err, quizPool) => {
+          if (err) return next(err);
+
+          Quiz.find({ isReported: true })
+            .sort({ field: "asc", _id: -1 })
+            .limit(5)
+            .exec((err, reportedQuizzes) => {
+              if (err) return next(err);
+
+              console.log(newestQuizzes);
+
+              res.render("quiz_dashboard", {
+                newestQuizzes,
+                quizPool,
+                reportedQuizzes,
+                style: "style.css"
+              });
+            });
+        });
     });
 };
 

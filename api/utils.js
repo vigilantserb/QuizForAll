@@ -85,7 +85,7 @@ module.exports = {
   generatePageButtons: function(count, numberOfButtons, elementsPerPage, currentPage, callback) {
     let pages = [];
     if (count < numberOfButtons * elementsPerPage) {
-      for (let i = 1; i <= Math.floor(count / elementsPerPage); i++) {
+      for (let i = 1; i <= Math.ceil(count / elementsPerPage); i++) {
         pages.push(i);
       }
       callback(pages);
