@@ -1,0 +1,41 @@
+<div>
+    {{>nav }}
+</div>
+<div class="container">
+    {{>messages }}
+</div>
+<table class="table table-hover mt-5">
+    <thead>
+        <tr>
+            <th scope="col">Quiz name</th>
+            <th scope="col">Quiz type</th>
+            <th scope="col">Question count</th>
+            <th scope="col">Options</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#if newestQuizzes}}
+        {{#each newestQuizzes}}
+        <tr>
+            <td>{{this.quizName}}</td>
+            <td>{{this.quizType}}</td>
+            <td>{{this.questionCount}}</td>
+            <td>
+                {{#if ../user.isAdmin}}
+                <a href="/quiz/delete/{{this._id}}/{{../page}}/reported" class="btn btn-danger">Delete</a>
+                <a href="/quiz/edit/{{this._id}}/{{../page}}/reported" class="btn btn-warning">Edit</a>
+                <a href="/quiz/review/{{this._id}}/{{../page}}/reported" class="btn btn-success">Reviewed</a>
+                {{else}}No options available{{/if}}
+            </td>
+        </tr>
+        {{/each}}
+        {{/if}}
+    </tbody>
+</table>
+<div class="container text-center">
+    {{#if pages}}
+    {{#each pages}}
+    <a href="/api/question/pending/{{this}}" class="btn btn-success">{{this}}</a>
+    {{/each}}
+    {{/if}}
+</div>
