@@ -27,9 +27,9 @@
             </td>
             <td>
                 {{#if ../user.isAdmin}}
-                <a href="/api/question/delete/{{this._id}}/{{../page}}/reported" class="btn btn-danger">Delete</a>
-                <a href="/api/question/edit/{{this._id}}/{{../page}}/reported" class="btn btn-warning">Edit</a>
-                <a href="/api/question/review/{{this._id}}/{{../page}}/reported" class="btn btn-success">Reviewed</a>
+                <a href="/question/delete/{{this._id}}/{{../page}}/reported" class="btn btn-danger">Delete</a>
+                <a href="/question/edit/{{this._id}}/{{../page}}/reported" class="btn btn-warning">Edit</a>
+                <a href="/question/review/{{this._id}}/{{../page}}/reported" class="btn btn-success">Reviewed</a>
                 {{else}}No options available{{/if}}
             </td>
         </tr>
@@ -40,7 +40,7 @@
 <div class="container text-center">
     {{#if pages}}
     {{#each pages}}
-    <a href="/api/question/reported/{{this}}" class="btn btn-success">{{this}}</a>
+    <a href="/question/reported/{{this}}" class="btn btn-success">{{this}}</a>
     {{/each}}
     {{/if}}
 </div>

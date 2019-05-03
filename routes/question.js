@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { ensureAuthenticated } = require("../config/auth");
 
-const api = require("../controllers/api.controller");
+const api = require("../controllers/question.controller");
 
 router.get("/test", (req, res) => {
   const Answer = require("../models/answer.model");
@@ -35,23 +35,19 @@ router.get("/test", (req, res) => {
   }
 });
 
-router.get("/question", api.addQuestionView);
-router.get("/question/pending/:page", api.pendingQuestionView);
-router.get("/question/pool/:page", api.poolQuestionView);
-router.get("/question/reported/:page", api.reportQuestionView);
-router.get("/question/dashboard", api.questionDashboardView);
+router.get("/", api.addQuestionView);
+router.get("/pending/:page", api.pendingQuestionView);
+router.get("/pool/:page", api.poolQuestionView);
+router.get("/reported/:page", api.reportQuestionView);
+router.get("/dashboard", api.questionDashboardView);
 
-router.get("/about", api.aboutView);
-router.get("/submit", api.submitIdeaView);
-router.get("/users", api.userDashboardView);
+router.get("/delete/:id/:page/:type", api.deleteQuestionButton);
+router.get("/approve/:id/:page/:type", api.approveQuestionButton);
+router.get("/unapprove/:id/:page/:type", api.unapproveQuestionButton);
+router.get("/edit/:id/:page/:type", api.editQuestionButton);
+router.get("/review/:id/:page/:type", api.reviewQuestionButton);
 
-router.get("/question/delete/:id/:page/:type", api.deleteQuestionButton);
-router.get("/question/approve/:id/:page/:type", api.approveQuestionButton);
-router.get("/question/unapprove/:id/:page/:type", api.unapproveQuestionButton);
-router.get("/question/edit/:id/:page/:type", api.editQuestionButton);
-router.get("/question/review/:id/:page/:type", api.reviewQuestionButton);
-
-router.post("/question", api.addQuestionMongoose);
+router.post("/", api.addQuestionMongoose);
 
 router.post("/submit", api.submitIdeaEmail);
 

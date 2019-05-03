@@ -61,10 +61,14 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", require("./routes/index"));
-app.use("/user", require("./routes/users"));
-app.use("/api", require("./routes/api"));
-app.use("/player", require("./routes/player"));
+app.use("/player", require("./routes/player.api"));
+app.use("/question", require("./routes/question"));
 app.use("/quiz", require("./routes/quiz"));
+app.use("/user", require("./routes/users"));
+app.use("/about", require("./routes/about"));
+app.use("/submit", require("./routes/submit"));
+
+app.use("/mobile", require("./routes/mobile"));
 
 app.use(function(req, res, next) {
   next(createError(404));

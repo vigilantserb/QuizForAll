@@ -26,8 +26,8 @@
             </td>
             <td>
                 {{#if ../user.isAdmin}}
-                <a href="/api/question/delete/{{this._id}}/{{../page}}/pool" class="btn btn-danger">Delete</a>
-                <a href="/api/question/unapprove/{{this._id}}/{{../page}}/pool" class="btn btn-success">Remove from
+                <a href="/question/delete/{{this._id}}/{{../page}}/pool" class="btn btn-danger">Delete</a>
+                <a href="/question/unapprove/{{this._id}}/{{../page}}/pool" class="btn btn-success">Remove from
                     pool</a>
                 {{else}}No options available{{/if}}
             </td>
@@ -39,7 +39,7 @@
 <div class="container text-center">
     {{#if pages}}
     {{#each pages}}
-    <a href="/api/question/pool/{{this}}" class="btn btn-success">{{this}}</a>
+    <a href="/question/pool/{{this}}" class="btn btn-success">{{this}}</a>
     {{/each}}
     {{/if}}
 </div>

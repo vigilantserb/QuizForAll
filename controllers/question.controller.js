@@ -178,7 +178,7 @@ module.exports.deleteQuestionButton = (req, res, next) => {
   Question.deleteOne({ _id: req.params.id })
     .then(() => {
       req.flash("success_msg", "Question successfully deleted");
-      res.redirect(`/api/question/${req.params.type}/${req.params.page}`);
+      res.redirect(`/question/${req.params.type}/${req.params.page}`);
     })
     .catch(err => next(err));
 };
@@ -187,7 +187,7 @@ module.exports.editQuestionButton = (req, res, next) => {
   Question.findOne({ _id: req.params.id })
     .then(() => {
       req.flash("error_msg", "Functionality in development.");
-      res.redirect(`/api/question/${req.params.type}/${req.params.page}`);
+      res.redirect(`/question/${req.params.type}/${req.params.page}`);
     })
     .catch(err => next(err));
 };
@@ -196,7 +196,7 @@ module.exports.approveQuestionButton = (req, res, next) => {
   Question.findOneAndUpdate({ _id: req.params.id }, { isApproved: true, lastEdited: Date.now() })
     .then(question => {
       req.flash("success_msg", "Question successfully approved.");
-      res.redirect(`/api/question/${req.params.type}/${req.params.page}`);
+      res.redirect(`/question/${req.params.type}/${req.params.page}`);
     })
     .catch(err => next(err));
 };
@@ -205,7 +205,7 @@ module.exports.unapproveQuestionButton = (req, res, next) => {
   Question.findOneAndUpdate({ _id: req.params.id }, { isApproved: false, lastEdited: Date.now() })
     .then(question => {
       req.flash("success_msg", "Question successfully unapproved.");
-      res.redirect(`/api/question/${req.params.type}/${req.params.page}`);
+      res.redirect(`/question/${req.params.type}/${req.params.page}`);
     })
     .catch(err => next(err));
 };
@@ -214,7 +214,7 @@ module.exports.reviewQuestionButton = (req, res, next) => {
   Question.findOneAndUpdate({ _id: req.params.id }, { isReported: false, lastEdited: Date.now() })
     .then(question => {
       req.flash("success_msg", "Question successfully reviewed and added back into the pool.");
-      res.redirect(`/api/question/${req.params.type}/${req.params.page}`);
+      res.redirect(`/question/${req.params.type}/${req.params.page}`);
     })
     .catch(err => next(err));
 };
@@ -306,7 +306,7 @@ module.exports.submitIdeaEmail = (req, res, next) => {
     if (err) return next(err);
     else {
       req.flash("success_msg", "Question submitted successfully.");
-      res.redirect("/api/submit");
+      res.redirect("/submit");
     }
   });
 };
