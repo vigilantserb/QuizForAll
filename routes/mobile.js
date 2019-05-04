@@ -8,6 +8,6 @@ router.get("/login", controller.playerLogin);
 router.get("/register", controller.playerRegister);
 router.get("/token", controller.playerRefreshAccessToken);
 router.get("/verify/:token", controller.playerVerifyAccount);
-router.get("/quiz", verifyToken, controller.playerQuiz);
+router.get("/quiz/:id", verifyToken, controller.playerQuiz);
 
 module.exports = router;

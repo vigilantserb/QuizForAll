@@ -15,6 +15,7 @@ module.exports.addNewQuizView = (req, res) => {
 module.exports.pendingQuizzesView = (req, res, next) => {
   let perPage = 10,
     currentPage = Math.max(0, req.params.page);
+
   Quiz.countDocuments({ isApproved: false }).then(c => {
     if (c) {
       Quiz.find({ isApproved: false })
@@ -38,6 +39,7 @@ module.exports.pendingQuizzesView = (req, res, next) => {
           });
         });
     } else {
+      req.flash("error_msg", "Fetching quizzes unsuccessful.");
       res.render("quiz_pending", {
         user: req.user,
         style: "style.css"
@@ -72,6 +74,7 @@ module.exports.poolQuizzesView = (req, res) => {
           });
         });
     } else {
+      req.flash("error_msg", "Fetching quizzes unsuccessful.");
       res.render("quiz_pool", {
         user: req.user,
         style: "style.css"
@@ -106,6 +109,7 @@ module.exports.reportedQuizzesView = (req, res) => {
           });
         });
     } else {
+      req.flash("error_msg", "Fetching quizzes unsuccessful.");
       res.render("quiz_reported", {
         user: req.user,
         style: "style.css"
@@ -237,17 +241,30 @@ module.exports.reviewQuizButton = (req, res, next) => {
 
 module.exports.addNewQuizMongoose = (req, res, next) => {
   let { quizType, quizName } = req.body;
-  //do the checks here
+  let errors = [];
 
-  const newQuiz = new Quiz({
-    quizType,
-    quizName
-  });
+  if (!quizType || !quizName) {
+    errors.push({ msg: "Please fill in all the fields." });
+  }
 
-  newQuiz.save().then(quiz => {
-    //provide the quiz id as a parameter to this call
-    res.redirect(`/quiz/questions/${quiz._id}/1`);
-  });
+  if (errors.length > 0) {
+    res.render("quiz_add_quiz", {
+      errors,
+      style: "style.css"
+    });
+  } else {
+    const newQuiz = new Quiz({
+      quizType,
+      quizName
+    });
+
+    newQuiz
+      .save()
+      .then(quiz => {
+        res.redirect(`/quiz/questions/${quiz._id}/1`);
+      })
+      .catch(err => next(err));
+  }
 };
 
 module.exports.addQuestionsToQuizMongoose = (req, res, next) => {

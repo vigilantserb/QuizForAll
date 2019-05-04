@@ -1,5 +1,4 @@
 const Question = require("../models/question.model");
-const Answer = require("../models/answer.model");
 const nodemailer = require("nodemailer");
 
 let questionsPerPage = 10,
@@ -251,7 +250,7 @@ module.exports.addQuestionMongoose = (req, res, next) => {
   } else {
     let correctAnswer = isCorrect[0];
     let isCorrectArray = [];
-    let answerArray = [];
+    let answers = [];
 
     if (correctAnswer === "1") isCorrectArray.push(true);
     else isCorrectArray.push(false);
@@ -262,26 +261,21 @@ module.exports.addQuestionMongoose = (req, res, next) => {
     if (correctAnswer === "4") isCorrectArray.push(true);
     else isCorrectArray.push(false);
 
-    answerArray.push({ answerText: answer1, isCorrect: isCorrectArray[0] });
-    answerArray.push({ answerText: answer2, isCorrect: isCorrectArray[1] });
-    answerArray.push({ answerText: answer3, isCorrect: isCorrectArray[2] });
-    answerArray.push({ answerText: answer4, isCorrect: isCorrectArray[3] });
+    answers.push({ answerText: answer1, isCorrect: isCorrectArray[0] });
+    answers.push({ answerText: answer2, isCorrect: isCorrectArray[1] });
+    answers.push({ answerText: answer3, isCorrect: isCorrectArray[2] });
+    answers.push({ answerText: answer4, isCorrect: isCorrectArray[3] });
+    let newQuestion = new Question({
+      questionBody,
+      questionCategory,
+      answers
+    });
 
-    Answer.insertMany(answerArray)
-      .then(answers => {
-        let newQuestion = new Question({
-          questionBody,
-          questionCategory,
-          answers
-        });
-
-        newQuestion
-          .save()
-          .then(question => {
-            req.flash("success_msg", "Question submitted successfully.");
-            res.redirect("/dashboard");
-          })
-          .catch(err => next(err));
+    newQuestion
+      .save()
+      .then(question => {
+        req.flash("success_msg", "Question submitted successfully.");
+        res.redirect("/dashboard");
       })
       .catch(err => next(err));
   }

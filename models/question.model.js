@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const QuestionSchema = new mongoose.Schema({
   questionBody: { type: String, required: true },
   questionCategory: { type: String, required: true },
-  answers: [{ type: Schema.Types.ObjectId, ref: "Answer", required: true }],
+  answers: [{ answerText: String, isCorrect: Boolean }],
   isReported: { type: Boolean, required: false, default: false },
   isApproved: { type: Boolean, required: false, default: false },
   lastEdited: { type: Date, required: false }

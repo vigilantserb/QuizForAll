@@ -8,30 +8,27 @@ router.get("/test", (req, res) => {
   const Answer = require("../models/answer.model");
   const Question = require("../models/question.model");
   const faker = require("faker");
-  let answerArray = [];
+  let answers = [];
 
   let i;
   for (i = 0; i < 5; i++) {
-    answerArray.push({ answerText: faker.lorem.word(), isCorrect: false });
-    answerArray.push({ answerText: faker.lorem.word(), isCorrect: false });
-    answerArray.push({ answerText: faker.lorem.word(), isCorrect: true });
-    answerArray.push({ answerText: faker.lorem.word(), isCorrect: false });
+    answers.push({ answerText: faker.lorem.word(), isCorrect: false });
+    answers.push({ answerText: faker.lorem.word(), isCorrect: false });
+    answers.push({ answerText: faker.lorem.word(), isCorrect: true });
+    answers.push({ answerText: faker.lorem.word(), isCorrect: false });
 
-    Answer.insertMany(answerArray).then(answers => {
-      let newQuestion = new Question({
-        questionBody: faker.lorem.sentence(),
-        questionCategory: faker.lorem.word(),
-        answers,
-        isReported: true
-      });
-
-      newQuestion
-        .save()
-        .then(() => {
-          console.log("Question added successfully.");
-        })
-        .catch(err => console.log(err));
+    let newQuestion = new Question({
+      questionBody: faker.lorem.sentence(),
+      questionCategory: faker.lorem.word(),
+      answers
     });
+
+    newQuestion
+      .save()
+      .then(() => {
+        console.log("Question added successfully.");
+      })
+      .catch(err => console.log(err));
   }
 });
 

@@ -1,4 +1,6 @@
 const Player = require("../models/player.model");
+const Quiz = require("../models/quiz.model");
+
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const randtoken = require("rand-token");
@@ -132,5 +134,16 @@ module.exports.playerVerifyAccount = (req, res, next) => {
 };
 
 module.exports.playerQuiz = (req, res) => {
-  res.status(200).send({ message: "We're in." });
+  //Treba mi od igraca kviz na koji je stisnuo
+  //Vraca mu pitanja tog kviza sa ponudjenim odgovorima
+  let { quizId } = req.params.id;
+  if (!quizId) {
+    return res.status(400).send({ message: "Please provide a quiz id." });
+  }
+
+  Quiz.findById(quizId)
+    .populate("questions")
+    .then(quiz => {
+      console.log(quiz);
+    });
 };
