@@ -136,13 +136,15 @@ module.exports.playerVerifyAccount = (req, res, next) => {
 module.exports.playerQuiz = (req, res) => {
   //Treba mi od igraca kviz na koji je stisnuo
   //Vraca mu pitanja tog kviza sa ponudjenim odgovorima
-  let { quizId } = req.params.id;
+
+  let quizId = req.params.id;
+
   if (!quizId) {
     return res.status(400).send({ message: "Please provide a quiz id." });
   }
 
   Quiz.findById(quizId)
-    .populate("questions")
+    .populate("questions", "questionBody")
     .then(quiz => {
       console.log(quiz);
     });

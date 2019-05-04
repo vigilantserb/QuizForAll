@@ -51,7 +51,7 @@ module.exports.pendingQuizzesView = (req, res, next) => {
 module.exports.poolQuizzesView = (req, res) => {
   let perPage = 10,
     currentPage = Math.max(0, req.params.page);
-  Quiz.countDocuments({ isApproved: false }).then(c => {
+  Quiz.countDocuments({ isApproved: true }).then(c => {
     if (c) {
       Quiz.find({ isApproved: true })
         .populate("questions", "id")
@@ -129,7 +129,6 @@ module.exports.addQuestionsToQuizView = (req, res, next) => {
 
         if (c) {
           Question.find({ isApproved: true })
-            .populate("answers", "answerText")
             .limit(perPage)
             .skip(perPage * (currentPage - 1))
             .sort({ field: "asc", _id: -1 })

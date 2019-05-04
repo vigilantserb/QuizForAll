@@ -5,13 +5,12 @@ const { ensureAuthenticated } = require("../config/auth");
 const api = require("../controllers/question.controller");
 
 router.get("/test", (req, res) => {
-  const Answer = require("../models/answer.model");
   const Question = require("../models/question.model");
   const faker = require("faker");
   let answers = [];
 
   let i;
-  for (i = 0; i < 5; i++) {
+  for (i = 0; i < 100; i++) {
     answers.push({ answerText: faker.lorem.word(), isCorrect: false });
     answers.push({ answerText: faker.lorem.word(), isCorrect: false });
     answers.push({ answerText: faker.lorem.word(), isCorrect: true });

@@ -45,7 +45,6 @@ module.exports.pendingQuestionView = (req, res, next) => {
 
     if (c) {
       Question.find({ isApproved: false })
-        .populate("answers", "answerText")
         .limit(perPage)
         .skip(perPage * (currentPage - 1))
         .sort({ field: "asc", _id: -1 })
@@ -80,7 +79,6 @@ module.exports.poolQuestionView = (req, res, next) => {
 
     if (c) {
       Question.find({ isApproved: true })
-        .populate("answers", "answerText")
         .limit(perPage)
         .skip(perPage * (currentPage - 1))
         .sort({ field: "asc", _id: -1 })
@@ -115,7 +113,6 @@ module.exports.reportQuestionView = (req, res, next) => {
 
     if (c) {
       Question.find({ isReported: true })
-        .populate("answers", "answerText")
         .limit(perPage)
         .skip(perPage * (currentPage - 1))
         .sort({ field: "asc", _id: -1 })
