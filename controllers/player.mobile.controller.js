@@ -134,18 +134,77 @@ module.exports.playerVerifyAccount = (req, res, next) => {
 };
 
 module.exports.playerQuiz = (req, res) => {
-  //Treba mi od igraca kviz na koji je stisnuo
-  //Vraca mu pitanja tog kviza sa ponudjenim odgovorima
-
-  let quizId = req.params.id;
+  let quizId = req.body.quizId;
 
   if (!quizId) {
     return res.status(400).send({ message: "Please provide a quiz id." });
   }
 
   Quiz.findById(quizId)
-    .populate("questions", "questionBody")
+    .populate("questions")
     .then(quiz => {
-      console.log(quiz);
+      res.status(200).send(quiz);
     });
+};
+
+module.exports.latestQuizzes = (req, res) => {
+  Quiz.find({ isApproved: true }, "quizName quizType ratings")
+    .limit(10)
+    .sort({ field: "asc", _id: -1 })
+    .then(quizzes => {
+      res.status(200).send(quizzes);
+    });
+};
+
+module.exports.exploreQuizzes = (req, res, next) => {
+  //uzmi od korisnika njegov id
+  let id = req.body.playerId;
+
+  //pretrazi igrane kvizove, sortiraj po tipovima
+  Player.findById(id)
+    .populate("playedQuizzes")
+    .then(player => {
+      let counts = {};
+
+      //ovde sam izbrojao sve kvizove prema njihovim tipovima
+      for (let i = 0; i < player.playedQuizzes.length; i++) {
+        if (!counts.hasOwnProperty(player.playedQuizzes[i].quizType)) {
+          counts[player.playedQuizzes[i].quizType] = 1;
+        } else {
+          counts[player.playedQuizzes[i].quizType]++;
+        }
+      }
+      //sada cu da sortiram od najviseg count-a do najnizeg
+
+      //onda cu da uradim pretragu prvih X kategorija po Quiz pool kvizovima
+
+      //Onda cu da izmesam taj dobijeni quiz pool tih X kategorija random i prikazem na explore stranici
+    });
+};
+
+module.exports.updatePlayedQuizzesPlayer = (req, res, next) => {
+  let { quizId, playerId } = req.body;
+
+  if (!quizId || !playerId) {
+    return res.status(404).send({ message: "Provided the needed fields." });
+  }
+
+  Quiz.findById(quizId)
+    .then(quiz => {
+      //proveri da li je igrac vec igrao kviz, ako jeste makse, ako nije moze
+      if (quiz) {
+        Player.updateOne({ _id: playerId }, { $push: { playedQuizzes: quiz._id } })
+          .then(player => {
+            if (player) {
+              return res.status(200).send({ message: "Quiz successfully finished." });
+            } else {
+              return res.status(404).send({ message: "No player found with provided id." });
+            }
+          })
+          .catch(err => next(err));
+      } else {
+        return res.status(404).send({ message: "No quiz found with provided id." });
+      }
+    })
+    .catch(err => next(err));
 };
