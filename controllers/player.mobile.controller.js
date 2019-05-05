@@ -9,6 +9,7 @@ let refreshTokens = {};
 
 const config = require("../config/keys");
 let { generatePlayerConfirmationPage } = require("../api/utils");
+let { sortByKey } = require("../api/sort");
 
 module.exports.playerRegister = (req, res, next) => {
   let { username, email, password, password2 } = req.body;
@@ -157,16 +158,12 @@ module.exports.latestQuizzes = (req, res) => {
 };
 
 module.exports.exploreQuizzes = (req, res, next) => {
-  //uzmi od korisnika njegov id
   let id = req.body.playerId;
 
-  //pretrazi igrane kvizove, sortiraj po tipovima
   Player.findById(id)
     .populate("playedQuizzes")
     .then(player => {
       let counts = {};
-
-      //ovde sam izbrojao sve kvizove prema njihovim tipovima
       for (let i = 0; i < player.playedQuizzes.length; i++) {
         if (!counts.hasOwnProperty(player.playedQuizzes[i].quizType)) {
           counts[player.playedQuizzes[i].quizType] = 1;
@@ -174,11 +171,26 @@ module.exports.exploreQuizzes = (req, res, next) => {
           counts[player.playedQuizzes[i].quizType]++;
         }
       }
-      //sada cu da sortiram od najviseg count-a do najnizeg
-
-      //onda cu da uradim pretragu prvih X kategorija po Quiz pool kvizovima
-
-      //Onda cu da izmesam taj dobijeni quiz pool tih X kategorija random i prikazem na explore stranici
+      let array = [];
+      for (var key in counts) {
+        if (counts.hasOwnProperty(key)) {
+          array.push({ type: key, count: counts[key] });
+        }
+      }
+      array = sortByKey(array, "count");
+      let exploreQuizzes = [];
+      let typeCount = 0;
+      array.forEach((type, index, array) => {
+        Quiz.find({ quizType: type.type }, "quizName quizType")
+          .limit(10)
+          .then(quizzes => {
+            typeCount++;
+            exploreQuizzes.push(quizzes);
+            if (typeCount === array.length) {
+              res.send(exploreQuizzes);
+            }
+          });
+      });
     });
 };
 
