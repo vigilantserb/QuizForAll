@@ -23,11 +23,14 @@ router.get("/test", (req, res, next) => {
 
     newQuiz.save().then(quiz => {
       for (let j = 0; j < randomQuestions; j++) {
-        Question.findOne({}, "_id").then(question => {
-          Quiz.update({ _id: quiz._id }, { $push: { questions: question._id } }).then(quiz => {
-            console.log("question added to quiz.");
+        let rnd = Math.floor(Math.random() * (+max - +min)) + +min;
+        Question.findOne({}, "_id")
+          .skip(rnd)
+          .then(question => {
+            Quiz.update({ _id: quiz._id }, { $push: { questions: question._id } }).then(quiz => {
+              console.log("question added to quiz.");
+            });
           });
-        });
       }
     });
   }
@@ -41,10 +44,12 @@ router.get("/reported/:page", controller.reportedQuizzesView);
 router.get("/dashboard", controller.quizDashboardView);
 
 router.get("/delete/:id/:page/:type", controller.deleteQuizButton);
+router.get("/deleteQuestion/:id/:page/:type", controller.deleteQuestionButton);
 router.get("/approve/:id/:page/:type", controller.approveQuizButton);
 router.get("/unapprove/:id/:page/:type", controller.unapproveQuizButton);
 router.get("/edit/:id/:page/:type", controller.editQuizButton);
 router.get("/review/:id/:page/:type", controller.reviewQuizButton);
+router.get("/details/:id", controller.quizDetailsButton);
 
 router.post("/add", controller.addNewQuizMongoose);
 router.get("/addquestion/:quizId/:questionId/:page", controller.addQuestionsToQuizMongoose);

@@ -7,10 +7,10 @@ const api = require("../controllers/question.controller");
 router.get("/test", (req, res) => {
   const Question = require("../models/question.model");
   const faker = require("faker");
-  let answers = [];
 
   let i;
   for (i = 0; i < 100; i++) {
+    let answers = [];
     answers.push({ answerText: faker.lorem.word(), isCorrect: false });
     answers.push({ answerText: faker.lorem.word(), isCorrect: false });
     answers.push({ answerText: faker.lorem.word(), isCorrect: true });

@@ -19,13 +19,10 @@ module.exports.pendingQuizzesView = (req, res, next) => {
   Quiz.countDocuments({ isApproved: false }).then(c => {
     if (c) {
       Quiz.find({ isApproved: false })
-        .populate("questions", "id")
         .limit(perPage)
         .skip(perPage * (currentPage - 1))
         .sort({ field: "asc", _id: -1 })
-        .exec((err, newestQuizzes) => {
-          if (err) next(err);
-
+        .then(newestQuizzes => {
           for (let i = 0; i < newestQuizzes.length; i++) newestQuizzes[i].questionCount = newestQuizzes[i].questions.length;
 
           generatePageButtons(c, questionsPerPage, numberOfButtonsPerPage, currentPage, pages => {
@@ -54,7 +51,6 @@ module.exports.poolQuizzesView = (req, res) => {
   Quiz.countDocuments({ isApproved: true }).then(c => {
     if (c) {
       Quiz.find({ isApproved: true })
-        .populate("questions", "id")
         .limit(perPage)
         .skip(perPage * (currentPage - 1))
         .sort({ field: "asc", _id: -1 })
@@ -89,7 +85,6 @@ module.exports.reportedQuizzesView = (req, res) => {
   Quiz.countDocuments({ isReported: true }).then(c => {
     if (c) {
       Quiz.find({ isApproved: true })
-        .populate("questions", "id")
         .limit(perPage)
         .skip(perPage * (currentPage - 1))
         .sort({ field: "asc", _id: -1 })
@@ -121,46 +116,49 @@ module.exports.reportedQuizzesView = (req, res) => {
 module.exports.addQuestionsToQuizView = (req, res, next) => {
   let perPage = 10,
     currentPage = Math.max(0, req.params.page);
-  Quiz.findById(req.params.id)
-    .populate("questions", "id")
-    .then(quiz => {
-      Question.countDocuments({ isApproved: false }, (err, c) => {
-        if (err) return next(err);
 
-        if (c) {
-          Question.find({ isApproved: true })
-            .limit(perPage)
-            .skip(perPage * (currentPage - 1))
-            .sort({ field: "asc", _id: -1 })
-            .exec((err, poolQuestions) => {
-              if (err) return next(err);
-              for (let i = 0; i < poolQuestions.length; i++) {
-                for (let j = 0; j < quiz.questions.length; j++) {
-                  if (quiz.questions[j].id === poolQuestions[i].id) {
-                    poolQuestions[i].isInQuiz = true;
-                  }
+  Quiz.findById(req.params.id).then(quiz => {
+    Question.countDocuments({ isApproved: true }, (err, c) => {
+      if (err) return next(err);
+
+      if (c) {
+        Question.find({ isApproved: true })
+          .limit(perPage)
+          .skip(perPage * (currentPage - 1))
+          .sort({ field: "asc", _id: -1 })
+          .exec((err, poolQuestions) => {
+            if (err) return next(err);
+
+            for (let i = 0; i < poolQuestions.length; i++) {
+              for (let j = 0; j < quiz.questions.length; j++) {
+                if (JSON.stringify(quiz.questions[j]._id) == JSON.stringify(poolQuestions[i]._id)) {
+                  poolQuestions[i].isInQuiz = true;
+                  console.log(quiz.questions[j]._id);
                 }
               }
+            }
 
-              generatePageButtons(c, questionsPerPage, numberOfButtonsPerPage, currentPage, pages => {
-                res.render("quiz_add_questions", {
-                  user: req.user,
-                  style: "style.css",
-                  poolQuestions,
-                  pages,
-                  currentPage,
-                  quizId: req.params.id
-                });
+            for (let j = 0; j < poolQuestions.length; j++) {}
+
+            generatePageButtons(c, questionsPerPage, numberOfButtonsPerPage, currentPage, pages => {
+              res.render("quiz_add_questions", {
+                user: req.user,
+                style: "style.css",
+                poolQuestions,
+                pages,
+                currentPage,
+                quizId: req.params.id
               });
             });
-        } else {
-          res.render("quiz_add_questions", {
-            user: req.user,
-            style: "style.css"
           });
-        }
-      });
+      } else {
+        res.render("quiz_add_questions", {
+          user: req.user,
+          style: "style.css"
+        });
+      }
     });
+  });
 };
 
 module.exports.quizDashboardView = (req, res, next) => {
@@ -196,6 +194,15 @@ module.exports.quizDashboardView = (req, res, next) => {
 module.exports.deleteQuizButton = (req, res, next) => {
   Quiz.deleteOne({ _id: req.params.id })
     .then(() => {
+      req.flash("success_msg", "Quiz successfully deleted");
+      res.redirect(`/quiz/${req.params.type}/${req.params.page}`);
+    })
+    .catch(err => next(err));
+};
+
+module.exports.deleteQuestionButton = (req, res, next) => {
+  Question.deleteOne({ _id: req.params.id })
+    .then(() => {
       req.flash("success_msg", "Question successfully deleted");
       res.redirect(`/quiz/${req.params.type}/${req.params.page}`);
     })
@@ -205,7 +212,7 @@ module.exports.deleteQuizButton = (req, res, next) => {
 module.exports.approveQuizButton = (req, res, next) => {
   Quiz.findByIdAndUpdate({ _id: req.params.id }, { isApproved: true })
     .then(() => {
-      req.flash("success_msg", "Question successfully deleted");
+      req.flash("success_msg", "Quiz successfully approved");
       res.redirect(`/quiz/${req.params.type}/${req.params.page}`);
     })
     .catch(err => next(err));
@@ -214,7 +221,7 @@ module.exports.approveQuizButton = (req, res, next) => {
 module.exports.unapproveQuizButton = (req, res, next) => {
   Quiz.findByIdAndUpdate({ _id: req.params.id }, { isApproved: false })
     .then(() => {
-      req.flash("success_msg", "Question successfully deleted");
+      req.flash("success_msg", "Quiz successfully unapproved");
       res.redirect(`/quiz/${req.params.type}/${req.params.page}`);
     })
     .catch(err => next(err));
@@ -232,8 +239,20 @@ module.exports.editQuizButton = (req, res, next) => {
 module.exports.reviewQuizButton = (req, res, next) => {
   Quiz.findByIdAndUpdate({ _id: req.params.id }, { isReported: false })
     .then(() => {
-      req.flash("success_msg", "Question successfully deleted");
+      req.flash("success_msg", "Quiz successfully reviewed");
       res.redirect(`/quiz/${req.params.type}/${req.params.page}`);
+    })
+    .catch(err => next(err));
+};
+
+module.exports.quizDetailsButton = (req, res, next) => {
+  Quiz.findOne({ _id: req.params.id })
+    .then(quiz => {
+      res.render("quiz_details", {
+        quiz,
+        user: req.user,
+        style: "style.css"
+      });
     })
     .catch(err => next(err));
 };
@@ -269,7 +288,7 @@ module.exports.addNewQuizMongoose = (req, res, next) => {
 module.exports.addQuestionsToQuizMongoose = (req, res, next) => {
   let { questionId, quizId, page } = req.params;
   Question.findById(questionId).then(question => {
-    Quiz.update({ _id: quizId }, { $push: { questions: question._id } }).then(quiz => {
+    Quiz.update({ _id: quizId }, { $push: { questions: question } }).then(quiz => {
       res.redirect(`/quiz/questions/${quizId}/${page}`);
     });
   });
@@ -278,7 +297,7 @@ module.exports.addQuestionsToQuizMongoose = (req, res, next) => {
 module.exports.removeQuestionFromQuizMongoose = (req, res, next) => {
   let { questionId, quizId, page } = req.params;
   Question.findById(questionId).then(question => {
-    Quiz.update({ _id: quizId }, { $pull: { questions: question._id } }).then(quiz => {
+    Quiz.update({ _id: quizId }, { $pull: { questions: question } }).then(quiz => {
       res.redirect(`/quiz/questions/${quizId}/${page}`);
     });
   });

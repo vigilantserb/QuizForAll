@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const QuizSchema = new mongoose.Schema({
   quizType: { type: String, required: true },
   quizName: { type: String, required: true },
-  questions: [{ type: Schema.Types.ObjectId, ref: "Question", required: false }],
+  questions: [{ type: Object, required: false }],
   isReported: { type: Boolean, required: false, default: false },
   isApproved: { type: Boolean, required: false, default: false },
   lastEdited: { type: Date, required: false },
