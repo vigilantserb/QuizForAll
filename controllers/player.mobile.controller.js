@@ -158,12 +158,13 @@ module.exports.latestQuizzes = (req, res) => {
 };
 
 module.exports.exploreQuizzes = (req, res, next) => {
-  let id = req.body.playerId;
+  let { playerId } = req.body;
 
-  Player.findById(id)
+  Player.findById(playerId)
     .populate("playedQuizzes")
     .then(player => {
-      let counts = {};
+      let counts = { Movies: 0, "TV Shows": 0, Geography: 0, History: 0, Mixed: 0 };
+
       for (let i = 0; i < player.playedQuizzes.length; i++) {
         if (!counts.hasOwnProperty(player.playedQuizzes[i].quizType)) {
           counts[player.playedQuizzes[i].quizType] = 1;
@@ -171,27 +172,46 @@ module.exports.exploreQuizzes = (req, res, next) => {
           counts[player.playedQuizzes[i].quizType]++;
         }
       }
+
       let array = [];
+
       for (var key in counts) {
         if (counts.hasOwnProperty(key)) {
           array.push({ type: key, count: counts[key] });
         }
       }
+
       array = sortByKey(array, "count");
+
       let exploreQuizzes = [];
       let typeCount = 0;
+
       array.forEach((type, index, array) => {
         Quiz.find({ quizType: type.type }, "quizName quizType")
           .limit(10)
           .then(quizzes => {
             typeCount++;
-            exploreQuizzes.push(quizzes);
+            quizzes.forEach(quiz => {
+              exploreQuizzes.push(quiz);
+            });
             if (typeCount === array.length) {
-              res.send(exploreQuizzes);
+              typeCount = 0;
+              exploreQuizzes.forEach((quiz, index, array) => {
+                typeCount++;
+                player.playedQuizzes.forEach(playedQuiz => {
+                  if (JSON.stringify(playedQuiz._id) === JSON.stringify(quiz._id)) {
+                    array.splice(index, 1);
+                  }
+                });
+                if (typeCount === array.length) {
+                  res.send(exploreQuizzes);
+                }
+              });
             }
           });
       });
-    });
+    })
+    .catch(err => next(err));
 };
 
 module.exports.updatePlayedQuizzesPlayer = (req, res, next) => {
@@ -203,7 +223,7 @@ module.exports.updatePlayedQuizzesPlayer = (req, res, next) => {
 
   Quiz.findById(quizId)
     .then(quiz => {
-      //proveri da li je igrac vec igrao kviz, ako jeste makse, ako nije moze
+      //check if player has already played quiz, if yes, then don't add it.
       if (quiz) {
         Player.updateOne({ _id: playerId }, { $push: { playedQuizzes: quiz._id } })
           .then(player => {
@@ -219,4 +239,26 @@ module.exports.updatePlayedQuizzesPlayer = (req, res, next) => {
       }
     })
     .catch(err => next(err));
+};
+
+module.exports.playerForgotPasswordEmail = (req, res, next) => {
+  //take email
+  //check if email exists
+  //send verification mail to mail provided
+};
+
+module.exports.playerAllowPasswordUpdate = (req, res, next) => {
+  //receive token from link
+  //check if token is valid
+  //check if decoded email exists in db
+  //if yes, update field isAllowedToPasswordUpdate to true, any else to false
+};
+
+module.exports.playerPasswordUpdate = (req, res, next) => {
+  //get pw and pw2
+  //check validity
+  //if 0 errors, find user with email provided
+  //if exists, check isAllowedToPasswordUpdate
+  //if yes, update password and change isAllowedToPasswordUpdate to false
+  //any else case update isAllowedToPasswordUpdate to false, since there's only one chance
 };

@@ -13,21 +13,23 @@ router.get("/test", (req, res, next) => {
   let min = 5;
   let max = 20;
   let randomQuestions = Math.floor(Math.random() * (+max - +min)) + +min;
-  let randomQuizzes = Math.floor(Math.random() * (+max - +min)) + +min;
 
-  for (let i = 0; i < randomQuizzes; i++) {
+  for (let i = 0; i < 150; i++) {
+    let types = ["Movies", "TV Shows", "Geography", "History", "Mixed"];
+    let rndType = Math.floor(Math.random() * (+4 - +0)) + +0;
+
     let newQuiz = new Quiz({
       quizName: faker.lorem.sentence(),
-      quizType: faker.lorem.word()
+      quizType: types[rndType]
     });
 
     newQuiz.save().then(quiz => {
       for (let j = 0; j < randomQuestions; j++) {
         let rnd = Math.floor(Math.random() * (+max - +min)) + +min;
-        Question.findOne({}, "_id")
+        Question.findOne({})
           .skip(rnd)
           .then(question => {
-            Quiz.update({ _id: quiz._id }, { $push: { questions: question._id } }).then(quiz => {
+            Quiz.update({ _id: quiz._id }, { $push: { questions: question } }).then(quiz => {
               console.log("question added to quiz.");
             });
           });

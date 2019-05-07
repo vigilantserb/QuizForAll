@@ -248,6 +248,7 @@ module.exports.reviewQuizButton = (req, res, next) => {
 module.exports.quizDetailsButton = (req, res, next) => {
   Quiz.findOne({ _id: req.params.id })
     .then(quiz => {
+      console.log(quiz);
       res.render("quiz_details", {
         quiz,
         user: req.user,
