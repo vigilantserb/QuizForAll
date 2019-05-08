@@ -11,11 +11,11 @@ router.get("/player/verify/:token", controller.playerVerifyAccount);
 router.get("/player/recovery", controller.playerForgotPasswordEmail);
 router.get("/player/update", controller.playerPasswordUpdate);
 
-router.get("/quiz/latest", controller.latestQuizzes);
-router.get("/quiz", controller.playerQuiz);
-router.get("/quiz/explore", controller.exploreQuizzes);
+router.get("/quiz/latest", controller.quizLatest);
+router.get("/quiz", controller.quizSingle);
+router.get("/quiz/explore", controller.quizExplore);
 
-router.get("/player/quizFinished", controller.updatePlayedQuizzesPlayer);
+router.get("/player/quizFinished", controller.playerUpdatePlayedQuiz);
 
 //subroutes needed for
 //player

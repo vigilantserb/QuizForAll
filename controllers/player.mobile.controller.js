@@ -134,7 +134,7 @@ module.exports.playerVerifyAccount = (req, res, next) => {
   });
 };
 
-module.exports.playerQuiz = (req, res) => {
+module.exports.quizSingle = (req, res) => {
   let quizId = req.body.quizId;
 
   if (!quizId) {
@@ -148,7 +148,7 @@ module.exports.playerQuiz = (req, res) => {
     });
 };
 
-module.exports.latestQuizzes = (req, res) => {
+module.exports.quizLatest = (req, res) => {
   Quiz.find({ isApproved: true }, "quizName quizType ratings")
     .limit(10)
     .sort({ field: "asc", _id: -1 })
@@ -157,7 +157,7 @@ module.exports.latestQuizzes = (req, res) => {
     });
 };
 
-module.exports.exploreQuizzes = (req, res, next) => {
+module.exports.quizExplore = (req, res, next) => {
   let { playerId } = req.body;
 
   Player.findById(playerId)
@@ -214,7 +214,7 @@ module.exports.exploreQuizzes = (req, res, next) => {
     .catch(err => next(err));
 };
 
-module.exports.updatePlayedQuizzesPlayer = (req, res, next) => {
+module.exports.playerUpdatePlayedQuiz = (req, res, next) => {
   let { quizId, playerId } = req.body;
 
   if (!quizId || !playerId) {
