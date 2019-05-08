@@ -12,7 +12,8 @@ const PlayerSchema = new mongoose.Schema({
   playedQuizzes: [{ type: Schema.Types.ObjectId, ref: "Quiz", required: false }],
   isBanned: { type: String, required: true, default: false },
   isVerified: { type: String, required: true, default: false },
-  latestActivity: { type: Date, required: false }
+  latestActivity: { type: Date, required: false },
+  updateToken: { token: { type: String, required: false }, dateOfApproval: { type: Date, required: false } }
 });
 
 const Question = mongoose.model("Player", PlayerSchema);

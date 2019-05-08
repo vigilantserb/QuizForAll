@@ -8,7 +8,7 @@ const randtoken = require("rand-token");
 let refreshTokens = {};
 
 const config = require("../config/keys");
-let { generatePlayerConfirmationPage } = require("../api/utils");
+let { generatePlayerConfirmationPage, generatePasswordRecoveryPage } = require("../api/utils");
 let { sortByKey } = require("../api/sort");
 
 module.exports.playerRegister = (req, res, next) => {
@@ -243,22 +243,58 @@ module.exports.updatePlayedQuizzesPlayer = (req, res, next) => {
 
 module.exports.playerForgotPasswordEmail = (req, res, next) => {
   //take email
+  let { email } = req.body;
   //check if email exists
-  //send verification mail to mail provided
-};
-
-module.exports.playerAllowPasswordUpdate = (req, res, next) => {
-  //receive token from link
-  //check if token is valid
-  //check if decoded email exists in db
-  //if yes, update field isAllowedToPasswordUpdate to true, any else to false
+  Player.findOne({ email: email })
+    .then(player => {
+      if (player) {
+        generatePasswordRecoveryPage(player.email);
+        res.status(200).send({ message: "Email sent successfully." });
+      } else {
+        res.status(404).send({ message: "Player with that email not found." });
+      }
+    })
+    .catch(err => next(err));
 };
 
 module.exports.playerPasswordUpdate = (req, res, next) => {
   //get pw and pw2
+  let { password, password2, email, token } = req.body;
   //check validity
+  if (!password || !password2 || !email || !token) {
+    return res.status(404).send({ message: "Please provide the needed fields." });
+  }
+
+  if (password.localeCompare(password2) != 0) {
+    return res.status(404).send({ message: "Password do not match." });
+  }
+
   //if 0 errors, find user with email provided
-  //if exists, check isAllowedToPasswordUpdate
-  //if yes, update password and change isAllowedToPasswordUpdate to false
-  //any else case update isAllowedToPasswordUpdate to false, since there's only one chance
+  Player.findOne({ email }).then(player => {
+    //any else case update isAllowedToPasswordUpdate to false, since there's only one chance
+    if (player) {
+      //if exists, check isAllowedToPasswordUpdate
+      if (player.updateToken) {
+        if (player.updateToken.token.localeCompare(token) == 0) {
+          //TODO if yes, check if date is in the allowed range
+          bcrypt.genSalt(10, (err, salt) => {
+            if (err) next(err);
+            bcrypt.hash(password, salt, (err, hash) => {
+              if (err) next(err);
+
+              Player.findOneAndUpdate({ email: email }, { updateToken: {}, password: hash }).then(user => {
+                res.status(200).send({ message: "Password update sucessfull." });
+              });
+            });
+          });
+        } else {
+          res.status(400).send({ message: "Tokens do not match." });
+        }
+      } else {
+        res.status(404).send({ message: "Update token not acquired." });
+      }
+    } else {
+      res.status(404).send({ message: "Email not found." });
+    }
+  });
 };

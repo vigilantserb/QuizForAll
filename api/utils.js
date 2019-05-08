@@ -60,7 +60,7 @@ module.exports = {
       expiresIn: 3600
     });
     console.log(token);
-    let link = `http://localhost:3000/player/verify/${token}`;
+    let link = `http://localhost:3000/mobile/player/verify/${token}`;
 
     let transporter = nodemailer.createTransport({
       service: "gmail",
@@ -79,6 +79,33 @@ module.exports = {
       if (err) console.log(err);
       else {
         console.log("Email sent successfully.", info);
+      }
+    });
+  },
+  generatePasswordRecoveryPage: function(email) {
+    const Player = require("../models/player.model");
+    const randtoken = require("rand-token");
+    let token = randtoken.uid(6);
+    let transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "forthepeoplequizapp@gmail.com",
+        pass: "quizapp995"
+      }
+    });
+    const mailOptions = {
+      from: "noreply@quizapp.com",
+      to: email,
+      subject: "Password recovery link",
+      html: `Please enter this code in the application. ${token}`
+    };
+    transporter.sendMail(mailOptions, function(err, info) {
+      if (err) console.log(err);
+      else {
+        let updateToken = { token, dateOfApproval: Date.now() };
+        Player.findOneAndUpdate({ email: email }, { updateToken }).then(user => {
+          console.log("Email sent successfully.");
+        });
       }
     });
   },

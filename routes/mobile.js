@@ -7,7 +7,9 @@ const { verifyToken } = require("../config/jwt");
 router.get("/login", controller.playerLogin);
 router.get("/register", controller.playerRegister);
 router.get("/token", controller.playerRefreshAccessToken);
-router.get("/verify/:token", controller.playerVerifyAccount);
+router.get("/player/verify/:token", controller.playerVerifyAccount);
+router.get("/player/recovery", controller.playerForgotPasswordEmail);
+router.get("/player/update", controller.playerPasswordUpdate);
 
 router.get("/quiz/latest", controller.latestQuizzes);
 router.get("/quiz", controller.playerQuiz);
