@@ -24,6 +24,7 @@
                 {{#if ../user.isAdmin}}
                 <a href="/quiz/delete/{{this._id}}/{{../page}}/pool" class="btn btn-danger">Delete</a>
                 <a href="/quiz/unapprove/{{this._id}}/{{../page}}/pool" class="btn btn-success">Remove from pool</a>
+                <a href="/quiz/details/{{this._id}}" class="btn btn-info">Details</a>
                 {{else}}No options available{{/if}}
             </td>
         </tr>
