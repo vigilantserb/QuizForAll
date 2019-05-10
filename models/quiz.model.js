@@ -5,6 +5,7 @@ const QuizSchema = new mongoose.Schema({
   quizType: { type: String, required: true },
   quizName: { type: String, required: true },
   questions: [{ type: Object, required: false }],
+  ratings: [{ type: Object, required: false }],
   isReported: { type: Boolean, required: false, default: false },
   isApproved: { type: Boolean, required: false, default: false },
   lastEdited: { type: Date, required: false }

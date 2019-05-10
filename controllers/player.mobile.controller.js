@@ -236,6 +236,41 @@ module.exports.quizExplore = (req, res, next) => {
     .catch(err => next(err));
 };
 
+module.exports.quizAddRating = (req, res, next) => {
+  let { rating, comment, playerId, quizId } = req.body;
+
+  if (!rating || !comment || !playerId || !quizId) {
+    return res.status(404).send({ message: "Fields not provided" });
+  }
+
+  Player.findById(playerId)
+    .then(player => {
+      if (player) {
+        let object = {
+          playerId,
+          rating,
+          comment
+        };
+        Quiz.findByIdAndUpdate(quizId, { $push: { ratings: object } })
+          .then(quiz => {
+            if (quiz) {
+              return res.status(200).send({ message: "Rating added successfully." });
+            } else {
+              return res.status(404).send({ message: "Quiz not found." });
+            }
+          })
+          .catch(err => {
+            next(err);
+          });
+      } else {
+        return res.status(404).send({ message: "Player not found." });
+      }
+    })
+    .catch(err => {
+      next(err);
+    });
+};
+
 module.exports.playerUpdatePlayedQuiz = (req, res, next) => {
   let { quizId, playerId } = req.body;
 
