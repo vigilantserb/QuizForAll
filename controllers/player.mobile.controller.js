@@ -280,12 +280,18 @@ module.exports.playerUpdatePlayedQuiz = (req, res, next) => {
 
   Quiz.findById(quizId)
     .then(quiz => {
+      console.log(quiz.numberOfPlays);
       //check if player has already played quiz, if yes, then don't add it.
       if (quiz) {
+        quiz.numberOfPlays = quiz.numberOfPlays + 1;
         Player.updateOne({ _id: playerId }, { $push: { playedQuizzes: quiz._id } })
           .then(player => {
             if (player) {
-              return res.status(200).send({ message: "Quiz successfully finished." });
+              Quiz.findByIdAndUpdate(quizId, { numberOfPlays: quiz.numberOfPlays }).then(quiz => {
+                if (quiz) {
+                  return res.status(200).send({ message: "Quiz successfully finished." });
+                }
+              });
             } else {
               return res.status(404).send({ message: "No player found with provided id." });
             }

@@ -6,6 +6,7 @@ const QuizSchema = new mongoose.Schema({
   quizName: { type: String, required: true },
   questions: [{ type: Object, required: false }],
   ratings: [{ type: Object, required: false }],
+  numberOfPlays: { type: Number, required: false, default: 0 },
   isReported: { type: Boolean, required: false, default: false },
   isApproved: { type: Boolean, required: false, default: false },
   lastEdited: { type: Date, required: false }
