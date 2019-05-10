@@ -84,7 +84,7 @@ module.exports.reportedQuizzesView = (req, res) => {
     currentPage = Math.max(0, req.params.page);
   Quiz.countDocuments({ isReported: true }).then(c => {
     if (c) {
-      Quiz.find({ isApproved: true })
+      Quiz.find({ isReported: true })
         .limit(perPage)
         .skip(perPage * (currentPage - 1))
         .sort({ field: "asc", _id: -1 })
