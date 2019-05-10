@@ -46,7 +46,6 @@ router.get("/reported/:page", controller.reportedQuizzesView);
 router.get("/dashboard", controller.quizDashboardView);
 
 router.get("/delete/:id/:page/:type", controller.deleteQuizButton);
-router.get("/deleteQuestion/:id/:page/:type", controller.deleteQuestionButton);
 router.get("/approve/:id/:page/:type", controller.approveQuizButton);
 router.get("/unapprove/:id/:page/:type", controller.unapproveQuizButton);
 router.get("/edit/:id/:page/:type", controller.editQuizButton);

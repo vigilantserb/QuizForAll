@@ -200,15 +200,6 @@ module.exports.deleteQuizButton = (req, res, next) => {
     .catch(err => next(err));
 };
 
-module.exports.deleteQuestionButton = (req, res, next) => {
-  Question.deleteOne({ _id: req.params.id })
-    .then(() => {
-      req.flash("success_msg", "Question successfully deleted");
-      res.redirect(`/quiz/${req.params.type}/${req.params.page}`);
-    })
-    .catch(err => next(err));
-};
-
 module.exports.approveQuizButton = (req, res, next) => {
   Quiz.findByIdAndUpdate({ _id: req.params.id }, { isApproved: true })
     .then(() => {
@@ -248,7 +239,6 @@ module.exports.reviewQuizButton = (req, res, next) => {
 module.exports.quizDetailsButton = (req, res, next) => {
   Quiz.findOne({ _id: req.params.id })
     .then(quiz => {
-      console.log(quiz);
       res.render("quiz_details", {
         quiz,
         user: req.user,
@@ -296,10 +286,11 @@ module.exports.addQuestionsToQuizMongoose = (req, res, next) => {
 };
 
 module.exports.removeQuestionFromQuizMongoose = (req, res, next) => {
-  let { questionId, quizId, page } = req.params;
+  let { quizId, questionId, page } = req.params;
   Question.findById(questionId).then(question => {
-    Quiz.update({ _id: quizId }, { $pull: { questions: question } }).then(quiz => {
-      res.redirect(`/quiz/questions/${quizId}/${page}`);
+    var ObjectId = require("mongoose").Types.ObjectId;
+    Quiz.update({ _id: quizId }, { $pull: { questions: { _id: new ObjectId(questionId) } } }, { safe: true }).then(quiz => {
+      res.redirect(`/quiz/details/${quizId}`);
     });
   });
 };

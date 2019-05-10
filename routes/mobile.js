@@ -10,6 +10,7 @@ router.get("/token", controller.playerRefreshAccessToken);
 router.get("/player/verify/:token", controller.playerVerifyAccount);
 router.get("/player/recovery", controller.playerForgotPasswordEmail);
 router.get("/player/update", controller.playerPasswordUpdate);
+router.get("/player/quiz", controller.quizFinish);
 
 router.get("/quiz/latest", controller.quizLatest);
 router.get("/quiz", controller.quizSingle);

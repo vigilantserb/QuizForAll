@@ -7,7 +7,6 @@ const PlayerSchema = new mongoose.Schema({
   password: { type: String, required: true },
   correctAnswers: { type: String, required: true, default: "0" },
   wrongAnswers: { type: String, required: true, default: "0" },
-  attendedQuizes: { type: String, required: true, default: "0" },
   favoriteQuizzes: [{ type: Schema.Types.ObjectId, ref: "Quiz", required: false }],
   playedQuizzes: [{ type: Schema.Types.ObjectId, ref: "Quiz", required: false }],
   isBanned: { type: String, required: true, default: false },

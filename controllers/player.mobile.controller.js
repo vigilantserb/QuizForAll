@@ -148,6 +148,28 @@ module.exports.quizSingle = (req, res) => {
     });
 };
 
+module.exports.quizFinish = (req, res, next) => {
+  //receive quizId,hasCorrect,hasFalse, playerId,
+  let { quizId, hasCorrect, hasFalse, playerId } = req.body;
+
+  if (!quizId || !hasCorrect || !hasFalse || !playerId) {
+    return res.status(404).send({ message: "Provided the needed fields." });
+  }
+
+  Quiz.findById(quizId).then(quiz => {
+    if (quiz) {
+      Player.findById(playerId).then(player => {
+        let correctAnswers = Number(hasCorrect) + Number(player.correctAnswers);
+        let wrongAnswers = Number(hasFalse) + Number(player.wrongAnswers);
+
+        Player.findByIdAndUpdate(playerId, { correctAnswers, wrongAnswers, $push: { playedQuizzes: quiz } }).then(user => {
+          return res.status(200).send({ message: "succ" });
+        });
+      });
+    }
+  });
+};
+
 module.exports.quizLatest = (req, res) => {
   Quiz.find({ isApproved: true }, "quizName quizType ratings")
     .limit(10)
@@ -258,9 +280,8 @@ module.exports.playerForgotPasswordEmail = (req, res, next) => {
 };
 
 module.exports.playerPasswordUpdate = (req, res, next) => {
-  //get pw and pw2
   let { password, password2, email, token } = req.body;
-  //check validity
+
   if (!password || !password2 || !email || !token) {
     return res.status(404).send({ message: "Please provide the needed fields." });
   }
@@ -269,11 +290,8 @@ module.exports.playerPasswordUpdate = (req, res, next) => {
     return res.status(404).send({ message: "Password do not match." });
   }
 
-  //if 0 errors, find user with email provided
   Player.findOne({ email }).then(player => {
-    //any else case update isAllowedToPasswordUpdate to false, since there's only one chance
     if (player) {
-      //if exists, check isAllowedToPasswordUpdate
       if (player.updateToken) {
         if (player.updateToken.token.localeCompare(token) == 0) {
           //TODO if yes, check if date is in the allowed range
