@@ -13,7 +13,7 @@ router.get("/player/update", controller.playerPasswordUpdate);
 router.get("/player/quiz", controller.quizFinish);
 router.get("/player/quizFinished", controller.playerUpdatePlayedQuiz);
 
-router.get("/quiz/latest", controller.quizLatest);
+router.get("/quiz/latest/:page", controller.quizLatest);
 router.get("/quiz", controller.quizSingle);
 router.get("/quiz/explore", controller.quizExplore);
 router.get("/quiz/rating", controller.quizAddRating);

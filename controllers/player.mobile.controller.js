@@ -170,13 +170,18 @@ module.exports.quizFinish = (req, res, next) => {
   });
 };
 
-module.exports.quizLatest = (req, res) => {
-  Quiz.find({ isApproved: true }, "quizName quizType ratings")
-    .limit(10)
+module.exports.quizLatest = (req, res, next) => {
+  let perPage = 10,
+    currentPage = Math.max(0, req.params.page);
+
+  Quiz.find({ isApproved: true }, "quizName quizType ratings numberOfPlays")
+    .limit(perPage)
+    .skip(perPage * (currentPage - 1))
     .sort({ field: "asc", _id: -1 })
     .then(quizzes => {
       res.status(200).send(quizzes);
-    });
+    })
+    .catch(err => next(err));
 };
 
 module.exports.quizExplore = (req, res, next) => {
