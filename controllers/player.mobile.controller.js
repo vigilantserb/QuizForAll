@@ -285,26 +285,41 @@ module.exports.playerUpdatePlayedQuiz = (req, res, next) => {
 
   Quiz.findById(quizId)
     .then(quiz => {
-      console.log(quiz.numberOfPlays);
-      //check if player has already played quiz, if yes, then don't add it.
-      if (quiz) {
-        quiz.numberOfPlays = quiz.numberOfPlays + 1;
-        Player.updateOne({ _id: playerId }, { $push: { playedQuizzes: quiz._id } })
-          .then(player => {
-            if (player) {
-              Quiz.findByIdAndUpdate(quizId, { numberOfPlays: quiz.numberOfPlays }).then(quiz => {
-                if (quiz) {
-                  return res.status(200).send({ message: "Quiz successfully finished." });
-                }
-              });
-            } else {
-              return res.status(404).send({ message: "No player found with provided id." });
+      Player.findOne({ _id: playerId })
+        .populate("playedQuizzes")
+        .then(player => {
+          let isQuizPlayed = false;
+          if (player) {
+            for (let i = 0; i < player.playedQuizzes.length; i++) {
+              if (JSON.stringify(player.playedQuizzes[i]._id) === JSON.stringify(quizId)) {
+                isQuizPlayed = true;
+              }
             }
-          })
-          .catch(err => next(err));
-      } else {
-        return res.status(404).send({ message: "No quiz found with provided id." });
-      }
+          }
+          if (!isQuizPlayed) {
+            if (quiz) {
+              quiz.numberOfPlays = quiz.numberOfPlays + 1;
+              Player.updateOne({ _id: playerId }, { $push: { playedQuizzes: quiz._id } })
+                .then(player => {
+                  if (player) {
+                    Quiz.findByIdAndUpdate(quizId, { numberOfPlays: quiz.numberOfPlays }).then(quiz => {
+                      if (quiz) {
+                        return res.status(200).send({ message: "Quiz successfully finished." });
+                      }
+                    });
+                  } else {
+                    return res.status(404).send({ message: "No player found with provided id." });
+                  }
+                })
+                .catch(err => next(err));
+            } else {
+              return res.status(404).send({ message: "No quiz found with provided id." });
+            }
+          } else {
+            return res.status(400).send({ message: "User has already participated in the quiz." });
+          }
+        })
+        .catch(err => next(err));
     })
     .catch(err => next(err));
 };
