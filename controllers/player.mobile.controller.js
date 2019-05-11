@@ -4,6 +4,8 @@ const Quiz = require("../models/quiz.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const randtoken = require("rand-token");
+const moment = require("moment");
+const _ = require("lodash");
 
 let refreshTokens = {};
 
@@ -342,7 +344,7 @@ module.exports.playerForgotPasswordEmail = (req, res, next) => {
 
 module.exports.playerPasswordUpdate = (req, res, next) => {
   let { password, password2, email, token } = req.body;
-
+  let currentDate = Date.now();
   if (!password || !password2 || !email || !token) {
     return res.status(404).send({ message: "Please provide the needed fields." });
   }
@@ -351,29 +353,38 @@ module.exports.playerPasswordUpdate = (req, res, next) => {
     return res.status(404).send({ message: "Password do not match." });
   }
 
-  Player.findOne({ email }).then(player => {
-    if (player) {
-      if (player.updateToken) {
-        if (player.updateToken.token.localeCompare(token) == 0) {
-          //TODO if yes, check if date is in the allowed range
-          bcrypt.genSalt(10, (err, salt) => {
-            if (err) next(err);
-            bcrypt.hash(password, salt, (err, hash) => {
-              if (err) next(err);
+  Player.findOne({ email })
+    .then(player => {
+      if (player) {
+        if (player.updateToken.dateOfApproval) {
+          if (player.updateToken.token.localeCompare(token) == 0) {
+            let date1 = moment(player.updateToken.dateOfApproval),
+              date2 = moment(currentDate);
+            let duration = moment.duration(date2.diff(date1));
+            if (duration.asHours() < 1) {
+              bcrypt.genSalt(10, (err, salt) => {
+                if (err) next(err);
 
-              Player.findOneAndUpdate({ email: email }, { updateToken: {}, password: hash }).then(user => {
-                res.status(200).send({ message: "Password update sucessfull." });
+                bcrypt.hash(password, salt, (err, hash) => {
+                  if (err) next(err);
+
+                  Player.findOneAndUpdate({ email: email }, { updateToken: {}, password: hash }, { new: true }).then(user => {
+                    res.status(200).send({ message: "Password update sucessfull." });
+                  });
+                });
               });
-            });
-          });
+            } else {
+              res.status(409).send({ message: "Token expired." });
+            }
+          } else {
+            res.status(400).send({ message: "Tokens do not match." });
+          }
         } else {
-          res.status(400).send({ message: "Tokens do not match." });
+          res.status(404).send({ message: "Update token not acquired." });
         }
       } else {
-        res.status(404).send({ message: "Update token not acquired." });
+        res.status(404).send({ message: "Email not found." });
       }
-    } else {
-      res.status(404).send({ message: "Email not found." });
-    }
-  });
+    })
+    .catch(err => next(err));
 };
