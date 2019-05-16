@@ -14,17 +14,19 @@
         </tr>
     </thead>
     <tbody>
-        {{#if newestQuizzes}}
-        {{#each newestQuizzes}}
+        {{#if viewObject.newestQuizzes}}
+        {{#each viewObject.newestQuizzes}}
         <tr>
             <td>{{this.quizName}}</td>
             <td>{{this.quizType}}</td>
             <td>{{this.questionCount}}</td>
             <td>
                 {{#if ../user.isAdmin}}
-                <a href="/quiz/delete/{{this._id}}/{{../page}}/pending" class="btn btn-danger">Delete</a>
-                <a href="/quiz/edit/{{this._id}}/{{../page}}/pending" class="btn btn-warning">Edit</a>
-                <a href="/quiz/approve/{{this._id}}/{{../page}}/pending" class="btn btn-success">Approve</a>
+                <a href="/quiz/delete/{{this._id}}/{{../viewObject.currentPage}}/pending"
+                    class="btn btn-danger">Delete</a>
+                <a href="/quiz/edit/{{this._id}}/{{../viewObject.currentPage}}/pending" class="btn btn-warning">Edit</a>
+                <a href="/quiz/approve/{{this._id}}/{{../viewObject.currentPage}}/pending"
+                    class="btn btn-success">Approve</a>
                 <a href="/quiz/details/{{this._id}}" class="btn btn-info">Details</a>
                 {{else}}No options available{{/if}}
             </td>
@@ -34,8 +36,8 @@
     </tbody>
 </table>
 <div class="container text-center">
-    {{#if pages}}
-    {{#each pages}}
+    {{#if viewObject.pageArray}}
+    {{#each viewObject.pageArray}}
     <a href="/quiz/pending/{{this}}" class="btn btn-success">{{this}}</a>
     {{/each}}
     {{/if}}

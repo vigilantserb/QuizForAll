@@ -5,6 +5,7 @@ let questionsPerPage = 10,
     numberOfButtonsPerPage = 10;
 
 const { generatePageButtons } = require("../tools/utils");
+const { pendingQuizzesQuery } = require("./quiz_queries");
 
 module.exports.addNewQuizView = (req, res) => {
     res.render("quiz_add_quiz", {
@@ -16,33 +17,23 @@ module.exports.pendingQuizzesView = (req, res, next) => {
     let perPage = 10,
         currentPage = Math.max(0, req.params.page);
 
-    Quiz.countDocuments({ isApproved: false }).then(c => {
-        if (c) {
-            Quiz.find({ isApproved: false })
-                .limit(perPage)
-                .skip(perPage * (currentPage - 1))
-                .sort({ field: "asc", _id: -1 })
-                .then(newestQuizzes => {
-                    for (let i = 0; i < newestQuizzes.length; i++) newestQuizzes[i].questionCount = newestQuizzes[i].questions.length;
-
-                    generatePageButtons(c, questionsPerPage, numberOfButtonsPerPage, currentPage, pages => {
-                        res.render("quiz_pending", {
-                            newestQuizzes,
-                            pages,
-                            page: currentPage,
-                            user: req.user,
-                            style: "style.css"
-                        });
-                    });
-                });
-        } else {
-            req.flash("error_msg", "Fetching quizzes unsuccessful.");
+    pendingQuizzesQuery(perPage, currentPage, questionsPerPage, numberOfButtonsPerPage, { isApproved: false })
+        .then(viewObject => {
             res.render("quiz_pending", {
+                viewObject,
                 user: req.user,
                 style: "style.css"
             });
-        }
-    });
+        })
+        .catch(err => {
+            if (err) {
+                req.flash("error_msg", "Fetching quizzes unsuccessful.");
+                res.render("quiz_pending", {
+                    user: req.user,
+                    style: "style.css"
+                });
+            }
+        });
 };
 
 module.exports.poolQuizzesView = (req, res) => {
