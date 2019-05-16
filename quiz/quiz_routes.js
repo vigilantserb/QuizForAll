@@ -3,39 +3,39 @@ const router = express.Router();
 
 const { forwardAuthenticated } = require("../config/auth");
 
-const controller = require("../controllers/quiz.controller");
+const controller = require("./quiz_controller");
 
 router.get("/test", (req, res, next) => {
-  const Quiz = require("../models/quiz.model");
-  const Question = require("../models/question.model");
-  const faker = require("faker");
+    const Quiz = require("./quiz.model");
+    const Question = require("../question/question_model");
+    const faker = require("faker");
 
-  let min = 5;
-  let max = 20;
-  let randomQuestions = Math.floor(Math.random() * (+max - +min)) + +min;
+    let min = 5;
+    let max = 20;
+    let randomQuestions = Math.floor(Math.random() * (+max - +min)) + +min;
 
-  for (let i = 0; i < 150; i++) {
-    let types = ["Movies", "TV Shows", "Geography", "History", "Mixed"];
-    let rndType = Math.floor(Math.random() * (+4 - +0)) + +0;
+    for (let i = 0; i < 150; i++) {
+        let types = ["Movies", "TV Shows", "Geography", "History", "Mixed"];
+        let rndType = Math.floor(Math.random() * (+4 - +0)) + +0;
 
-    let newQuiz = new Quiz({
-      quizName: faker.lorem.sentence(),
-      quizType: types[rndType]
-    });
+        let newQuiz = new Quiz({
+            quizName: faker.lorem.sentence(),
+            quizType: types[rndType]
+        });
 
-    newQuiz.save().then(quiz => {
-      for (let j = 0; j < randomQuestions; j++) {
-        let rnd = Math.floor(Math.random() * (+max - +min)) + +min;
-        Question.findOne({})
-          .skip(rnd)
-          .then(question => {
-            Quiz.update({ _id: quiz._id }, { $push: { questions: question } }).then(quiz => {
-              console.log("question added to quiz.");
-            });
-          });
-      }
-    });
-  }
+        newQuiz.save().then(quiz => {
+            for (let j = 0; j < randomQuestions; j++) {
+                let rnd = Math.floor(Math.random() * (+max - +min)) + +min;
+                Question.findOne({})
+                    .skip(rnd)
+                    .then(question => {
+                        Quiz.update({ _id: quiz._id }, { $push: { questions: question } }).then(quiz => {
+                            console.log("question added to quiz.");
+                        });
+                    });
+            }
+        });
+    }
 });
 
 router.get("/add", controller.addNewQuizView);

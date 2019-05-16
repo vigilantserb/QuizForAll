@@ -3,7 +3,14 @@ const router = express.Router();
 
 const { forwardAuthenticated } = require("../config/auth");
 
-const controller = require("../controllers/user.controller");
+const controller = require("./user_controller");
+
+router.get("/dashboard", (req, res) => {
+    res.render("dashboard", {
+        user: req.user,
+        style: "style.css"
+    });
+});
 
 router.get("/login", forwardAuthenticated, controller.loginPageView);
 router.get("/register", controller.registerPageView);

@@ -19,17 +19,17 @@ require("./config/passport")(passport);
 
 const db = require("./config/keys").mongoURI;
 mongoose
-  .connect(db, { useNewUrlParser: true })
-  .then(() => console.log("MongoDB Connected"))
-  .catch(err => console.log(err));
+    .connect(db, { useNewUrlParser: true })
+    .then(() => console.log("MongoDB Connected"))
+    .catch(err => console.log(err));
 
 // Express session
 app.use(
-  session({
-    secret: "secret",
-    resave: true,
-    saveUninitialized: true
-  })
+    session({
+        secret: "secret",
+        resave: true,
+        saveUninitialized: true
+    })
 );
 
 // Passport middleware
@@ -41,10 +41,10 @@ app.use(flash());
 
 // Global variables
 app.use(function(req, res, next) {
-  res.locals.success_msg = req.flash("success_msg");
-  res.locals.error_msg = req.flash("error_msg");
-  res.locals.error = req.flash("error");
-  next();
+    res.locals.success_msg = req.flash("success_msg");
+    res.locals.error_msg = req.flash("error_msg");
+    res.locals.error = req.flash("error");
+    next();
 });
 
 app.set("views", [path.join(__dirname, "views"), path.join(__dirname, "/views/api/question"), path.join(__dirname, "/views/api/player"), path.join(__dirname, "/views/api/quiz")]);
@@ -60,31 +60,33 @@ app.use(cookieParser());
 
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use("/", require("./routes/index"));
-app.use("/player", require("./routes/player.api"));
-app.use("/question", require("./routes/question"));
-app.use("/quiz", require("./routes/quiz"));
-app.use("/user", require("./routes/users"));
-app.use("/about", require("./routes/about"));
-app.use("/submit", require("./routes/submit"));
+app.get("/", (req, res) => res.redirect("/user/login"));
 
-app.use("/mobile", require("./routes/mobile"));
+app.use("/player", require("./player/player_api_routes"));
+app.use("/question", require("./question/question_routes"));
+app.use("/quiz", require("./quiz/quiz_routes"));
+app.use("/user", require("./user/user_routes"));
+app.use("/api", require("./api/about"));
+app.use("/api", require("./api/submit"));
+
+app.use("/mobile", require("./player/player_mobile_routes"));
+app.use("/mobile", require("./quiz/quiz_mobile_routes"));
 
 app.use(function(req, res, next) {
-  next(createError(404));
+    next(createError(404));
 });
 
 app.use(function(err, req, res, next) {
-  res.locals.message = err.message;
-  res.locals.error = req.app.get("env") === "development" ? err : {};
+    res.locals.message = err.message;
+    res.locals.error = req.app.get("env") === "development" ? err : {};
 
-  if (req.originalUrl.includes("mobile")) {
-    return res.status(500).send({ message: "Internal server error", error: err });
-  } else {
-    // render the error page
-    res.status(err.status || 500);
-    res.render("error");
-  }
+    if (req.originalUrl.includes("mobile")) {
+        return res.status(500).send({ message: "Internal server error", error: err });
+    } else {
+        // render the error page
+        res.status(err.status || 500);
+        res.render("error");
+    }
 });
 
 module.exports = app;

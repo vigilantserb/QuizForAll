@@ -2,8 +2,8 @@ const express = require("express");
 const router = express.Router();
 const { ensureAuthenticated } = require("../config/auth");
 
-const api = require("../controllers/question.controller");
+const api = require("../question/question_controller");
 
-router.get("/", api.submitIdeaView);
+router.get("/", api.userDashboardView);
 
 module.exports = router;
