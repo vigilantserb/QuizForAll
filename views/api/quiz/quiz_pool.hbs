@@ -14,16 +14,17 @@
         </tr>
     </thead>
     <tbody>
-        {{#if poolQuizzes}}
-        {{#each poolQuizzes}}
+        {{#if viewObject.quizzes}}
+        {{#each viewObject.quizzes}}
         <tr>
             <td>{{this.quizName}}</td>
             <td>{{this.quizType}}</td>
             <td>{{this.questionCount}}</td>
             <td>
                 {{#if ../user.isAdmin}}
-                <a href="/quiz/delete/{{this._id}}/{{../page}}/pool" class="btn btn-danger">Delete</a>
-                <a href="/quiz/unapprove/{{this._id}}/{{../page}}/pool" class="btn btn-success">Remove from pool</a>
+                <a href="/quiz/delete/{{this._id}}/{{../viewObject.currentPage}}/pool" class="btn btn-danger">Delete</a>
+                <a href="/quiz/unapprove/{{this._id}}/{{../viewObject.currentPage}}/pool" class="btn btn-success">Remove
+                    from pool</a>
                 <a href="/quiz/details/{{this._id}}" class="btn btn-info">Details</a>
                 {{else}}No options available{{/if}}
             </td>
@@ -33,8 +34,8 @@
     </tbody>
 </table>
 <div class="container text-center">
-    {{#if pages}}
-    {{#each pages}}
+    {{#if viewObject.pageArray}}
+    {{#each viewObject.pageArray}}
     <a href="/quiz/pool/{{this}}" class="btn btn-success">{{this}}</a>
     {{/each}}
     {{/if}}

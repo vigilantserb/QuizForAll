@@ -5,7 +5,7 @@ let questionsPerPage = 10,
     numberOfButtonsPerPage = 10;
 
 const { generatePageButtons } = require("../tools/utils");
-const { pendingQuizzesQuery } = require("./quiz_queries");
+const { getQuizzesByCriteriaQuery } = require("./quiz_queries");
 
 module.exports.addNewQuizView = (req, res) => {
     res.render("quiz_add_quiz", {
@@ -16,8 +16,9 @@ module.exports.addNewQuizView = (req, res) => {
 module.exports.pendingQuizzesView = (req, res, next) => {
     let perPage = 10,
         currentPage = Math.max(0, req.params.page);
+    let criteria = { isApproved: false };
 
-    pendingQuizzesQuery(perPage, currentPage, questionsPerPage, numberOfButtonsPerPage, { isApproved: false })
+    getQuizzesByCriteriaQuery(perPage, currentPage, questionsPerPage, numberOfButtonsPerPage, criteria)
         .then(viewObject => {
             res.render("quiz_pending", {
                 viewObject,
@@ -25,83 +26,39 @@ module.exports.pendingQuizzesView = (req, res, next) => {
                 style: "style.css"
             });
         })
-        .catch(err => {
-            if (err) {
-                req.flash("error_msg", "Fetching quizzes unsuccessful.");
-                res.render("quiz_pending", {
-                    user: req.user,
-                    style: "style.css"
-                });
-            }
-        });
+        .catch(err => next(err));
 };
 
 module.exports.poolQuizzesView = (req, res) => {
     let perPage = 10,
         currentPage = Math.max(0, req.params.page);
-    Quiz.countDocuments({ isApproved: true }).then(c => {
-        if (c) {
-            Quiz.find({ isApproved: true })
-                .limit(perPage)
-                .skip(perPage * (currentPage - 1))
-                .sort({ field: "asc", _id: -1 })
-                .exec((err, poolQuizzes) => {
-                    if (err) next(err);
+    let criteria = { isApproved: true };
 
-                    for (let i = 0; i < poolQuizzes.length; i++) poolQuizzes[i].questionCount = poolQuizzes[i].questions.length;
-
-                    generatePageButtons(c, questionsPerPage, numberOfButtonsPerPage, currentPage, pages => {
-                        res.render("quiz_pool", {
-                            poolQuizzes,
-                            pages,
-                            page: currentPage,
-                            user: req.user,
-                            style: "style.css"
-                        });
-                    });
-                });
-        } else {
-            req.flash("error_msg", "Fetching quizzes unsuccessful.");
+    getQuizzesByCriteriaQuery(perPage, currentPage, questionsPerPage, numberOfButtonsPerPage, criteria)
+        .then(viewObject => {
             res.render("quiz_pool", {
+                viewObject,
                 user: req.user,
                 style: "style.css"
             });
-        }
-    });
+        })
+        .catch(err => next(err));
 };
 
 module.exports.reportedQuizzesView = (req, res) => {
     let perPage = 10,
         currentPage = Math.max(0, req.params.page);
-    Quiz.countDocuments({ isReported: true }).then(c => {
-        if (c) {
-            Quiz.find({ isReported: true })
-                .limit(perPage)
-                .skip(perPage * (currentPage - 1))
-                .sort({ field: "asc", _id: -1 })
-                .exec((err, reportedQuizzes) => {
-                    if (err) next(err);
+    let criteria = { isReported: true };
 
-                    for (let i = 0; i < reportedQuizzes.length; i++) reportedQuizzes[i].questionCount = reportedQuizzes[i].questions.length;
-
-                    generatePageButtons(c, questionsPerPage, numberOfButtonsPerPage, currentPage, pages => {
-                        res.render("quiz_reported", {
-                            reportedQuizzes,
-                            pages,
-                            page: currentPage,
-                            user: req.user,
-                            style: "style.css"
-                        });
-                    });
-                });
-        } else {
-            req.flash("error_msg", "Fetching quizzes unsuccessful.");
+    getQuizzesByCriteriaQuery(perPage, currentPage, questionsPerPage, numberOfButtonsPerPage, criteria)
+        .then(viewObject => {
             res.render("quiz_reported", {
+                viewObject,
                 user: req.user,
                 style: "style.css"
             });
-        }
-    });
+        })
+        .catch(err => next(err));
 };
 
 module.exports.addQuestionsToQuizView = (req, res, next) => {
