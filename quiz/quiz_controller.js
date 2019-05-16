@@ -81,7 +81,6 @@ module.exports.addQuestionsToQuizView = (req, res, next) => {
                             for (let j = 0; j < quiz.questions.length; j++) {
                                 if (JSON.stringify(quiz.questions[j]._id) == JSON.stringify(poolQuestions[i]._id)) {
                                     poolQuestions[i].isInQuiz = true;
-                                    console.log(quiz.questions[j]._id);
                                 }
                             }
                         }
