@@ -109,33 +109,30 @@ module.exports.addQuestionsToQuizView = (req, res, next) => {
 };
 
 module.exports.quizDashboardView = (req, res, next) => {
-    Quiz.find({ isApproved: false })
+    let viewObject = {};
+    Quiz.find({ isReported: true })
         .sort({ field: "asc", _id: -1 })
         .limit(5)
-        .exec((err, newestQuizzes) => {
-            if (err) return next(err);
-
-            Quiz.find({ isApproved: true })
+        .then(reportedQuizzes => {
+            viewObject["reportedQuizzes"] = reportedQuizzes;
+            return Quiz.find({ isApproved: true })
                 .sort({ field: "asc", _id: -1 })
-                .limit(5)
-                .exec((err, quizPool) => {
-                    if (err) return next(err);
-
-                    Quiz.find({ isReported: true })
-                        .sort({ field: "asc", _id: -1 })
-                        .limit(5)
-                        .exec((err, reportedQuizzes) => {
-                            if (err) return next(err);
-
-                            res.render("quiz_dashboard", {
-                                newestQuizzes,
-                                quizPool,
-                                reportedQuizzes,
-                                style: "style.css"
-                            });
-                        });
-                });
-        });
+                .limit(5);
+        })
+        .then(quizPool => {
+            viewObject["quizPool"] = quizPool;
+            return Quiz.find({ isApproved: false })
+                .sort({ field: "asc", _id: -1 })
+                .limit(5);
+        })
+        .then(newestQuizzes => {
+            viewObject["newestQuizzes"] = newestQuizzes;
+            res.render("quiz_dashboard", {
+                viewObject,
+                style: "style.css"
+            });
+        })
+        .catch(err => next(err));
 };
 
 module.exports.deleteQuizButton = (req, res, next) => {

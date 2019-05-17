@@ -6,8 +6,8 @@
     <div class="row mt-5">
         <div class="col-md-4">
             <p class="text-center">Pending quizzes</p>
-            {{#if newestQuizzes}}
-            {{#each newestQuizzes}}
+            {{#if viewObject.newestQuizzes}}
+            {{#each viewObject.newestQuizzes}}
             <div class="card card-body text-center">
                 <div class="text-center" role="alert">
                     <p>{{this.quizName}}</p>
@@ -26,8 +26,8 @@
 
         <div class="col-md-4">
             <p class="text-center">Quiz pool</p>
-            {{#if quizPool}}
-            {{#each quizPool}}
+            {{#if viewObject.quizPool}}
+            {{#each viewObject.quizPool}}
             <div class="card card-body text-center">
                 <div class="text-center" role="alert">
                     <p>{{this.quizName}}</p>
@@ -46,8 +46,8 @@
 
         <div class="col-md-4">
             <p class="text-center">Reported quizzes</p>
-            {{#if reportedQuizzes}}
-            {{#each reportedQuizzes}}
+            {{#if viewObject.reportedQuizzes}}
+            {{#each viewObject.reportedQuizzes}}
             <div class="card card-body text-center">
                 <div class="text-center" role="alert">
                     <p>{{this.quizName}}</p>
