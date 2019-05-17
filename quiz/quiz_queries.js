@@ -1,4 +1,4 @@
-const Quiz = require("../quiz/quiz.model");
+const Quiz = require("./quiz_model");
 const { generatePageButtons } = require("../tools/utils");
 
 module.exports.getQuizzesByCriteriaQuery = (limit, currentPage, questionCount, buttonCount, criteria) => {

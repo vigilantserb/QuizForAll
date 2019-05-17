@@ -1,5 +1,5 @@
 const Player = require("./player_model");
-const Quiz = require("../quiz/quiz.model");
+const Quiz = require("../quiz/quiz_model");
 
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");

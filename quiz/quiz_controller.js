@@ -1,10 +1,12 @@
-const Quiz = require("./quiz.model");
+const Quiz = require("./quiz_model");
 const Question = require("../question/question_model");
+const Player = require("../player/player_model");
 
-let questionsPerPage = 10,
-    numberOfButtonsPerPage = 10;
+let questionCount = 10,
+    buttonCount = 10;
 
 const { generatePageButtons } = require("../tools/utils");
+const { sortByKey } = require("../tools/sort");
 const { getQuizzesByCriteriaQuery } = require("./quiz_queries");
 
 module.exports.addNewQuizView = (req, res) => {
@@ -14,11 +16,11 @@ module.exports.addNewQuizView = (req, res) => {
 };
 
 module.exports.pendingQuizzesView = (req, res, next) => {
-    let perPage = 10,
+    let limit = 10,
         currentPage = Math.max(0, req.params.page);
     let criteria = { isApproved: false };
 
-    getQuizzesByCriteriaQuery(perPage, currentPage, questionsPerPage, numberOfButtonsPerPage, criteria)
+    getQuizzesByCriteriaQuery(limit, currentPage, questionCount, buttonCount, criteria)
         .then(viewObject => {
             res.render("quiz_pending", {
                 viewObject,
@@ -30,11 +32,11 @@ module.exports.pendingQuizzesView = (req, res, next) => {
 };
 
 module.exports.poolQuizzesView = (req, res) => {
-    let perPage = 10,
+    let limit = 10,
         currentPage = Math.max(0, req.params.page);
     let criteria = { isApproved: true };
 
-    getQuizzesByCriteriaQuery(perPage, currentPage, questionsPerPage, numberOfButtonsPerPage, criteria)
+    getQuizzesByCriteriaQuery(limit, currentPage, questionCount, buttonCount, criteria)
         .then(viewObject => {
             res.render("quiz_pool", {
                 viewObject,
@@ -46,11 +48,11 @@ module.exports.poolQuizzesView = (req, res) => {
 };
 
 module.exports.reportedQuizzesView = (req, res) => {
-    let perPage = 10,
+    let limit = 10,
         currentPage = Math.max(0, req.params.page);
     let criteria = { isReported: true };
 
-    getQuizzesByCriteriaQuery(perPage, currentPage, questionsPerPage, numberOfButtonsPerPage, criteria)
+    getQuizzesByCriteriaQuery(limit, currentPage, questionCount, buttonCount, criteria)
         .then(viewObject => {
             res.render("quiz_reported", {
                 viewObject,
@@ -62,7 +64,7 @@ module.exports.reportedQuizzesView = (req, res) => {
 };
 
 module.exports.addQuestionsToQuizView = (req, res, next) => {
-    let perPage = 10,
+    let limit = 10,
         currentPage = Math.max(0, req.params.page);
 
     Quiz.findById(req.params.id).then(quiz => {
@@ -71,8 +73,8 @@ module.exports.addQuestionsToQuizView = (req, res, next) => {
 
             if (c) {
                 Question.find({ isApproved: true })
-                    .limit(perPage)
-                    .skip(perPage * (currentPage - 1))
+                    .limit(limit)
+                    .skip(limit * (currentPage - 1))
                     .sort({ field: "asc", _id: -1 })
                     .exec((err, poolQuestions) => {
                         if (err) return next(err);
@@ -87,7 +89,7 @@ module.exports.addQuestionsToQuizView = (req, res, next) => {
 
                         for (let j = 0; j < poolQuestions.length; j++) {}
 
-                        generatePageButtons(c, questionsPerPage, numberOfButtonsPerPage, currentPage, pages => {
+                        generatePageButtons(c, questionCount, buttonCount, currentPage, pages => {
                             res.render("quiz_add_questions", {
                                 user: req.user,
                                 style: "style.css",
@@ -136,51 +138,93 @@ module.exports.quizDashboardView = (req, res, next) => {
 };
 
 module.exports.deleteQuizButton = (req, res, next) => {
-    Quiz.deleteOne({ _id: req.params.id })
+    let { _id, type, page } = req.params;
+
+    if (!_id || !type || !page) {
+        req.flash("error_msg", "Deletion unsuccessful.");
+        res.redirect(`/quiz/dashboard`);
+    }
+
+    Quiz.deleteOne({ _id })
         .then(() => {
             req.flash("success_msg", "Quiz successfully deleted");
-            res.redirect(`/quiz/${req.params.type}/${req.params.page}`);
+            res.redirect(`/quiz/${type}/${page}`);
         })
         .catch(err => next(err));
 };
 
 module.exports.approveQuizButton = (req, res, next) => {
-    Quiz.findByIdAndUpdate({ _id: req.params.id }, { isApproved: true })
+    let { _id, type, page } = req.params;
+
+    if (!_id || !type || !page) {
+        req.flash("error_msg", "Approval unsuccessful.");
+        res.redirect(`/quiz/dashboard`);
+    }
+
+    Quiz.findByIdAndUpdate({ _id }, { isApproved: true })
         .then(() => {
             req.flash("success_msg", "Quiz successfully approved");
-            res.redirect(`/quiz/${req.params.type}/${req.params.page}`);
+            res.redirect(`/quiz/${type}/${page}`);
         })
         .catch(err => next(err));
 };
 
 module.exports.unapproveQuizButton = (req, res, next) => {
-    Quiz.findByIdAndUpdate({ _id: req.params.id }, { isApproved: false })
+    let { _id, type, page } = req.params;
+
+    if (!_id || !type || !page) {
+        req.flash("error_msg", "Unapproval unsuccessful.");
+        res.redirect(`/quiz/dashboard`);
+    }
+
+    Quiz.findByIdAndUpdate({ _id }, { isApproved: false })
         .then(() => {
             req.flash("success_msg", "Quiz successfully unapproved");
-            res.redirect(`/quiz/${req.params.type}/${req.params.page}`);
+            res.redirect(`/quiz/${type}/${page}`);
         })
         .catch(err => next(err));
 };
 
 module.exports.editQuizButton = (req, res, next) => {
-    Quiz.findById({ _id: req.params.id })
+    let { _id, type, page } = req.params;
+
+    if (!_id || !type || !page) {
+        req.flash("error_msg", "Edit unsuccessful.");
+        res.redirect(`/quiz/dashboard`);
+    }
+
+    Quiz.findById({ _id })
         .then(() => {
             req.flash("error_msg", "Not available.");
-            res.redirect(`/quiz/${req.params.type}/${req.params.page}`);
+            res.redirect(`/quiz/${type}/${page}`);
         })
         .catch(err => next(err));
 };
 
 module.exports.reviewQuizButton = (req, res, next) => {
-    Quiz.findByIdAndUpdate({ _id: req.params.id }, { isReported: false })
+    let { _id, type, page } = req.params;
+
+    if (!_id || !type || !page) {
+        req.flash("error_msg", "Review unsuccessful.");
+        res.redirect(`/quiz/dashboard`);
+    }
+
+    Quiz.findByIdAndUpdate({ _id }, { isReported: false })
         .then(() => {
             req.flash("success_msg", "Quiz successfully reviewed");
-            res.redirect(`/quiz/${req.params.type}/${req.params.page}`);
+            res.redirect(`/quiz/${type}/${page}`);
         })
         .catch(err => next(err));
 };
 
 module.exports.quizDetailsButton = (req, res, next) => {
+    let { _id } = req.params;
+
+    if (!_id) {
+        req.flash("error_msg", "Quiz details unavailable.");
+        res.redirect(`/quiz/dashboard`);
+    }
+
     Quiz.findOne({ _id: req.params.id })
         .then(quiz => {
             res.render("quiz_details", {
@@ -221,16 +265,29 @@ module.exports.addNewQuizMongoose = (req, res, next) => {
 };
 
 module.exports.addQuestionsToQuizMongoose = (req, res, next) => {
-    let { questionId, quizId, page } = req.params;
+    let { questionId, _id, page } = req.params;
+
+    if (!questionId || !_id || !page) {
+        req.flash("error_msg", "Question not added to quiz.");
+        res.redirect(`/quiz/questions/${_id}/${page}`);
+    }
+
     Question.findById(questionId).then(question => {
-        Quiz.update({ _id: quizId }, { $push: { questions: question } }).then(quiz => {
-            res.redirect(`/quiz/questions/${quizId}/${page}`);
+        Quiz.update({ _id }, { $push: { questions: question } }).then(quiz => {
+            req.flash("success_msg", "Question added to quiz successfully.");
+            res.redirect(`/quiz/questions/${_id}/${page}`);
         });
     });
 };
 
 module.exports.removeQuestionFromQuizMongoose = (req, res, next) => {
-    let { quizId, questionId, page } = req.params;
+    let { quizId, questionId } = req.params;
+
+    if (!questionId || !quizId) {
+        req.flash("error_msg", "Please provide the question and quiz ids.");
+        res.redirect(`/quiz/details/${quizId}`);
+    }
+
     Question.findById(questionId).then(question => {
         var ObjectId = require("mongoose").Types.ObjectId;
         Quiz.update({ _id: quizId }, { $pull: { questions: { _id: new ObjectId(questionId) } } }, { safe: true }).then(quiz => {
@@ -254,12 +311,12 @@ module.exports.quizSingle = (req, res) => {
 };
 
 module.exports.quizLatest = (req, res, next) => {
-    let perPage = 10,
+    let limit = 10,
         currentPage = Math.max(0, req.params.page);
 
     Quiz.find({ isApproved: true }, "quizName quizType ratings numberOfPlays")
-        .limit(perPage)
-        .skip(perPage * (currentPage - 1))
+        .limit(limit)
+        .skip(limit * (currentPage - 1))
         .sort({ field: "asc", _id: -1 })
         .then(quizzes => {
             res.status(200).send(quizzes);
@@ -269,6 +326,7 @@ module.exports.quizLatest = (req, res, next) => {
 
 module.exports.quizExplore = (req, res, next) => {
     let { playerId } = req.body;
+    let limit = 10;
 
     Player.findById(playerId)
         .populate("playedQuizzes")
@@ -298,7 +356,7 @@ module.exports.quizExplore = (req, res, next) => {
 
             array.forEach((type, index, array) => {
                 Quiz.find({ quizType: type.type }, "quizName quizType")
-                    .limit(10)
+                    .limit(limit)
                     .then(quizzes => {
                         typeCount++;
                         quizzes.forEach(quiz => {
