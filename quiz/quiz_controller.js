@@ -28,10 +28,19 @@ module.exports.pendingQuizzesView = (req, res, next) => {
                 style: "style.css"
             });
         })
-        .catch(err => next(err));
+        .catch(err => {
+            if (err.statusCode == 404) {
+                res.render("quiz_pending", {
+                    user: req.user,
+                    style: "style.css"
+                });
+            } else {
+                next(err);
+            }
+        });
 };
 
-module.exports.poolQuizzesView = (req, res) => {
+module.exports.poolQuizzesView = (req, res, next) => {
     let limit = 10,
         currentPage = Math.max(0, req.params.page);
     let criteria = { isApproved: true };
@@ -44,10 +53,19 @@ module.exports.poolQuizzesView = (req, res) => {
                 style: "style.css"
             });
         })
-        .catch(err => next(err));
+        .catch(err => {
+            if (err.statusCode == 404) {
+                res.render("quiz_pool", {
+                    user: req.user,
+                    style: "style.css"
+                });
+            } else {
+                next(err);
+            }
+        });
 };
 
-module.exports.reportedQuizzesView = (req, res) => {
+module.exports.reportedQuizzesView = (req, res, next) => {
     let limit = 10,
         currentPage = Math.max(0, req.params.page);
     let criteria = { isReported: true };
@@ -60,7 +78,16 @@ module.exports.reportedQuizzesView = (req, res) => {
                 style: "style.css"
             });
         })
-        .catch(err => next(err));
+        .catch(err => {
+            if (err.statusCode == 404) {
+                res.render("quiz_reported", {
+                    user: req.user,
+                    style: "style.css"
+                });
+            } else {
+                next(err);
+            }
+        });
 };
 
 module.exports.addQuestionsToQuizView = (req, res, next) => {
@@ -138,14 +165,14 @@ module.exports.quizDashboardView = (req, res, next) => {
 };
 
 module.exports.deleteQuizButton = (req, res, next) => {
-    let { _id, type, page } = req.params;
+    let { id, type, page } = req.params;
 
-    if (!_id || !type || !page) {
+    if (!id || !type || !page) {
         req.flash("error_msg", "Deletion unsuccessful.");
         res.redirect(`/quiz/dashboard`);
     }
 
-    Quiz.deleteOne({ _id })
+    Quiz.deleteOne({ _id: id })
         .then(() => {
             req.flash("success_msg", "Quiz successfully deleted");
             res.redirect(`/quiz/${type}/${page}`);
@@ -170,14 +197,14 @@ module.exports.approveQuizButton = (req, res, next) => {
 };
 
 module.exports.unapproveQuizButton = (req, res, next) => {
-    let { _id, type, page } = req.params;
+    let { id, type, page } = req.params;
 
-    if (!_id || !type || !page) {
+    if (!id || !type || !page) {
         req.flash("error_msg", "Unapproval unsuccessful.");
         res.redirect(`/quiz/dashboard`);
     }
 
-    Quiz.findByIdAndUpdate({ _id }, { isApproved: false })
+    Quiz.findByIdAndUpdate({ _id: id }, { isApproved: false })
         .then(() => {
             req.flash("success_msg", "Quiz successfully unapproved");
             res.redirect(`/quiz/${type}/${page}`);

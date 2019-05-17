@@ -23,12 +23,14 @@ module.exports.getQuizzesByCriteriaQuery = (limit, currentPage, questionCount, b
                         });
                 } else {
                     reject({
+                        statusCode: 404,
                         error: "Quiz count is zero"
                     });
                 }
             })
             .catch(err =>
                 reject({
+                    statusCode: 500,
                     error: err
                 })
             );
