@@ -4,33 +4,6 @@ const { ensureAuthenticated } = require("../config/auth");
 
 const api = require("./question_controller");
 
-router.get("/test", (req, res) => {
-    const Question = require("./question_model");
-    const faker = require("faker");
-
-    let i;
-    for (i = 0; i < 100; i++) {
-        let answers = [];
-        answers.push({ answerText: faker.lorem.word(), isCorrect: false });
-        answers.push({ answerText: faker.lorem.word(), isCorrect: false });
-        answers.push({ answerText: faker.lorem.word(), isCorrect: true });
-        answers.push({ answerText: faker.lorem.word(), isCorrect: false });
-
-        let newQuestion = new Question({
-            questionBody: faker.lorem.sentence(),
-            questionCategory: faker.lorem.word(),
-            answers
-        });
-
-        newQuestion
-            .save()
-            .then(() => {
-                console.log("Question added successfully.");
-            })
-            .catch(err => console.log(err));
-    }
-});
-
 router.get("/", api.addQuestionView);
 router.get("/pending/:page", api.pendingQuestionView);
 router.get("/pool/:page", api.poolQuestionView);

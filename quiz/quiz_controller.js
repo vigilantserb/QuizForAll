@@ -154,14 +154,14 @@ module.exports.deleteQuizButton = (req, res, next) => {
 };
 
 module.exports.approveQuizButton = (req, res, next) => {
-    let { _id, type, page } = req.params;
+    let { id, type, page } = req.params;
 
-    if (!_id || !type || !page) {
+    if (!id || !type || !page) {
         req.flash("error_msg", "Approval unsuccessful.");
         res.redirect(`/quiz/dashboard`);
     }
 
-    Quiz.findByIdAndUpdate({ _id }, { isApproved: true })
+    Quiz.findByIdAndUpdate({ _id: id }, { isApproved: true })
         .then(() => {
             req.flash("success_msg", "Quiz successfully approved");
             res.redirect(`/quiz/${type}/${page}`);
@@ -218,15 +218,16 @@ module.exports.reviewQuizButton = (req, res, next) => {
 };
 
 module.exports.quizDetailsButton = (req, res, next) => {
-    let { _id } = req.params;
+    let { id } = req.params;
 
-    if (!_id) {
+    if (!id) {
         req.flash("error_msg", "Quiz details unavailable.");
         res.redirect(`/quiz/dashboard`);
     }
 
-    Quiz.findOne({ _id: req.params.id })
+    Quiz.findOne({ _id: id })
         .then(quiz => {
+            console.log(quiz);
             res.render("quiz_details", {
                 quiz,
                 user: req.user,
@@ -269,7 +270,7 @@ module.exports.addQuestionsToQuizMongoose = (req, res, next) => {
 
     if (!questionId || !_id || !page) {
         req.flash("error_msg", "Question not added to quiz.");
-        res.redirect(`/quiz/questions/${_id}/${page}`);
+        return res.redirect(`/quiz/questions/${_id}/${page}`);
     }
 
     Question.findById(questionId).then(question => {

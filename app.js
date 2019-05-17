@@ -68,6 +68,7 @@ app.use("/quiz", require("./quiz/quiz_routes"));
 app.use("/user", require("./user/user_routes"));
 app.use("/api", require("./api/about"));
 app.use("/api", require("./api/submit"));
+app.use("/seed", require("./seed/seed_routes"));
 
 app.use("/mobile", require("./player/player_mobile_routes"));
 app.use("/mobile", require("./quiz/quiz_mobile_routes"));
