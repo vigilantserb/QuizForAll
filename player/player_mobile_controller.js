@@ -81,7 +81,7 @@ module.exports.playerLogin = (req, res, next) => {
     let { username, password } = req.body;
 
     if (!username || !password) {
-        res.status(401).send({ message: "Fill all the needed fields." });
+        return res.status(401).send({ message: "Fill all the needed fields." });
     }
 
     Player.findOne({ username: username }, "username password isVerified", (err, player) => {
@@ -93,8 +93,7 @@ module.exports.playerLogin = (req, res, next) => {
             if (player.isBanned) {
                 res.status(403).send({ message: "Your account has been banned." });
             }
-
-            if (player.isVerified) {
+            if (true) {
                 if (bcrypt.compareSync(password, player.password)) {
                     var token = jwt.sign({ id: player._id }, config.secret, {
                         expiresIn: 3600
