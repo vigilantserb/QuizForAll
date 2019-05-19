@@ -85,7 +85,7 @@ module.exports = {
     generatePasswordRecoveryPage: function(email) {
         const Player = require("../player/player_model");
         const randtoken = require("rand-token");
-        let token = randtoken.uid(6);
+        let token = randtoken.uid(6).toUpperCase();
         let transporter = nodemailer.createTransport({
             service: "gmail",
             auth: {

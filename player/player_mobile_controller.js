@@ -81,7 +81,7 @@ module.exports.playerLogin = (req, res, next) => {
     let { username, password } = req.body;
 
     if (!username || !password) {
-        return res.status(401).send({ message: "Fill all the needed fields." });
+        return res.status(422).send({ message: "Fill all the needed fields." });
     }
 
     Player.findOne({ username: username }, "username password isVerified", (err, player) => {
@@ -91,7 +91,7 @@ module.exports.playerLogin = (req, res, next) => {
             return res.status(404).send({ message: "Player not found." });
         } else {
             if (player.isBanned) {
-                res.status(403).send({ message: "Your account has been banned." });
+                res.status(418).send({ message: "Your account has been banned." });
             }
             if (true) {
                 if (bcrypt.compareSync(password, player.password)) {
@@ -110,7 +110,7 @@ module.exports.playerLogin = (req, res, next) => {
                     res.status(401).send({ message: "Invalid credentials." });
                 }
             } else {
-                return res.status(405).send({ message: "Player account not verified." });
+                return res.status(403).send({ message: "Player account not verified." });
             }
         }
     });
@@ -231,7 +231,7 @@ module.exports.playerPasswordUpdate = (req, res, next) => {
                                 });
                             });
                         } else {
-                            res.status(409).send({ message: "Token expired." });
+                            res.status(401).send({ message: "Token expired." });
                         }
                     } else {
                         res.status(400).send({ message: "Tokens do not match." });

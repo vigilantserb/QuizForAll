@@ -339,15 +339,16 @@ module.exports.quizSingle = (req, res) => {
 };
 
 module.exports.quizLatest = (req, res, next) => {
-    let limit = 10,
-        currentPage = Math.max(0, req.params.page);
+    let { limit, page } = req.query;
+    limit = Number(limit);
+    page = Number(page);
 
     Quiz.find({ isApproved: true }, "quizName quizType ratings numberOfPlays")
         .limit(limit)
-        .skip(limit * (currentPage - 1))
+        .skip(limit * (page - 1))
         .sort({ field: "asc", _id: -1 })
         .then(quizzes => {
-            res.status(200).send(quizzes);
+            res.status(200).send({ data: quizzes });
         })
         .catch(err => next(err));
 };

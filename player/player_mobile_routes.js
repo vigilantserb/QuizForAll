@@ -8,8 +8,8 @@ router.post("/login", controller.playerLogin);
 router.get("/register", controller.playerRegister);
 router.get("/token", controller.playerRefreshAccessToken);
 router.get("/player/verify/:token", controller.playerVerifyAccount);
-router.get("/player/recovery", controller.playerForgotPasswordEmail);
-router.get("/player/update", controller.playerPasswordUpdate);
+router.post("/player/recovery", controller.playerForgotPasswordEmail);
+router.post("/player/update", controller.playerPasswordUpdate);
 
 router.get("/player/quizFinished", controller.playerUpdatePlayedQuiz);
 
