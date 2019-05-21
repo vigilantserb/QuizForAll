@@ -25,7 +25,7 @@ module.exports.playerRegister = (req, res, next) => {
     }
 
     if (password.length < 6) {
-        return res.status(400).send("Password must be atleast 6 characters long.");
+        return res.status(400).send("Password must be at least 6 characters long.");
     }
 
     Player.find({ email: email }).then(player => {

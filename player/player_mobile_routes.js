@@ -5,7 +5,7 @@ const controller = require("./player_mobile_controller");
 const { verifyToken } = require("../config/jwt");
 
 router.post("/login", controller.playerLogin);
-router.get("/register", controller.playerRegister);
+router.post("/register", controller.playerRegister);
 router.get("/token", controller.playerRefreshAccessToken);
 router.get("/player/verify/:token", controller.playerVerifyAccount);
 router.post("/player/recovery", controller.playerForgotPasswordEmail);
