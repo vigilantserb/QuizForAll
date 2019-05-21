@@ -331,11 +331,9 @@ module.exports.quizSingle = (req, res) => {
         return res.status(400).send({ message: "Please provide a quiz id." });
     }
 
-    Quiz.findById(quizId)
-        .populate("questions")
-        .then(quiz => {
-            res.status(200).send(quiz);
-        });
+    Quiz.findById(quizId).then(quiz => {
+        res.status(200).send(quiz);
+    });
 };
 
 module.exports.quizLatest = (req, res, next) => {

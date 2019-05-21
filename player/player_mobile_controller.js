@@ -207,7 +207,7 @@ module.exports.playerPasswordUpdate = (req, res, next) => {
     }
 
     if (password.localeCompare(password2) != 0) {
-        return res.status(404).send({ message: "Password do not match." });
+        return res.status(422).send({ message: "Password do not match." });
     }
 
     Player.findOne({ email })
@@ -234,13 +234,13 @@ module.exports.playerPasswordUpdate = (req, res, next) => {
                             res.status(401).send({ message: "Token expired." });
                         }
                     } else {
-                        res.status(400).send({ message: "Tokens do not match." });
+                        res.status(421).send({ message: "Tokens do not match." });
                     }
                 } else {
-                    res.status(404).send({ message: "Update token not acquired." });
+                    res.status(420).send({ message: "Update token not acquired." });
                 }
             } else {
-                res.status(404).send({ message: "Email not found." });
+                res.status(423).send({ message: "Email not found." });
             }
         })
         .catch(err => next(err));
