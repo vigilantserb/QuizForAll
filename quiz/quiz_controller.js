@@ -102,7 +102,7 @@ module.exports.addQuestionsToQuizView = (req, res, next) => {
                 Question.find({ isApproved: true })
                     .limit(limit)
                     .skip(limit * (currentPage - 1))
-                    .sort({ field: "asc", _id: -1 })
+                    .sort({ lastEdited: -1 })
                     .exec((err, poolQuestions) => {
                         if (err) return next(err);
 
@@ -140,18 +140,18 @@ module.exports.addQuestionsToQuizView = (req, res, next) => {
 module.exports.quizDashboardView = (req, res, next) => {
     let viewObject = {};
     Quiz.find({ isReported: true })
-        .sort({ field: "asc", _id: -1 })
+        .sort({ lastEdited: -1 })
         .limit(5)
         .then(reportedQuizzes => {
             viewObject["reportedQuizzes"] = reportedQuizzes;
             return Quiz.find({ isApproved: true })
-                .sort({ field: "asc", _id: -1 })
+                .sort({ lastEdited: -1 })
                 .limit(5);
         })
         .then(quizPool => {
             viewObject["quizPool"] = quizPool;
             return Quiz.find({ isApproved: false })
-                .sort({ field: "asc", _id: -1 })
+                .sort({ lastEdited: -1 })
                 .limit(5);
         })
         .then(newestQuizzes => {
@@ -343,12 +343,12 @@ module.exports.quizLatest = (req, res, next) => {
     limit = Number(limit);
     page = Number(page);
 
-    Quiz.find({ isApproved: true }, "quizName quizType ratings numberOfPlays")
+    Quiz.find({ isApproved: true }, "quizName quizType ratings numberOfPlays lastEdited")
         .limit(limit)
         .skip(limit * (page - 1))
-        .sort({ field: "asc", _id: -1 })
+        .sort({ lastEdited: -1 })
         .then(quizzes => {
-            res.status(200).send({ data: quizzes });
+            res.status(200).send({ data: quizzes, page });
         })
         .catch(err => next(err));
 };

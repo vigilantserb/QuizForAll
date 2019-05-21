@@ -47,7 +47,10 @@ function createQuestion() {
     return {
         questionBody: faker.lorem.sentence(),
         questionCategory: types[randomCategory],
-        answers
+        answers,
+        lastEdited: Date.now(),
+        isApproved: true,
+        isReported: false
     };
 }
 
@@ -67,7 +70,33 @@ function createQuiz() {
 
     return {
         quizName: faker.lorem.sentence(),
-        quizType: types[rndType]
+        quizType: types[rndType],
+        numberOfPlays: Math.floor(Math.random() * (+999 - +0)) + +999,
+        ratings: [
+            {
+                playerId: "5cdeae956188c929162e7f09",
+                comment: faker.finance.accountName(),
+                rating: Math.floor(Math.random() * (+5 - +1)) + +1
+            },
+            {
+                playerId: "5cdeae956188c929162e7f09",
+                comment: faker.finance.accountName(),
+                rating: Math.floor(Math.random() * (+5 - +1)) + +1
+            },
+            {
+                playerId: "5cdeae956188c929162e7f09",
+                comment: faker.finance.accountName(),
+                rating: Math.floor(Math.random() * (+5 - +1)) + +1
+            },
+            {
+                playerId: "5cdeae956188c929162e7f09",
+                comment: faker.finance.accountName(),
+                rating: Math.floor(Math.random() * (+5 - +1)) + +1
+            }
+        ],
+        lastEdited: Date.now(),
+        isApproved: true,
+        isReported: false
     };
 }
 
