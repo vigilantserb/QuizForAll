@@ -354,18 +354,11 @@ module.exports.quizLatest = (req, res, next) => {
 };
 
 module.exports.quizExplore = (req, res, next) => {
-    let { page, limit, playerId } = req.query;
+    let { page, limit } = req.query;
     limit = Number(limit);
     page = Number(page);
-
-    Player.findById(playerId).then(player => {
-        if (player) {
-            let quizzes = randomQuizzesQuery(limit, page);
-            Promise.all(quizzes).then(data => res.send({ data }));
-        } else {
-            res.status(404).send();
-        }
-    });
+    let quizzes = randomQuizzesQuery(limit, page);
+    Promise.all(quizzes).then(data => res.send({ data }));
 };
 
 module.exports.quizAddRating = (req, res, next) => {
