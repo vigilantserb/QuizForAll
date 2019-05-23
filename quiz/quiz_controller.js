@@ -358,7 +358,9 @@ module.exports.quizExplore = (req, res, next) => {
     limit = Number(limit);
     page = Number(page);
     let quizzes = randomQuizzesQuery(limit, page);
-    Promise.all(quizzes).then(data => res.send({ data }));
+    Promise.all(quizzes).then(data => {
+        res.send({ data });
+    });
 };
 
 module.exports.quizAddRating = (req, res, next) => {
