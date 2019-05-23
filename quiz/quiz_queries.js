@@ -44,7 +44,7 @@ module.exports.randomQuizzesQuery = (limit, page) => {
     for (let i = 0; i < limit; i++) {
         let rnd = Math.floor(Math.random() * (+max - +min)) + +min;
         array.push(
-            Quiz.findOne({}, "quizName quizType numberOfPlays ratings")
+            Quiz.findOne({}, "quizName quizType numberOfPlays ratings lastEdited")
                 .skip(rnd + page)
                 .limit(1)
                 .then()
