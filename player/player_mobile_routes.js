@@ -11,6 +11,8 @@ router.get("/player/verify/:token", controller.playerVerifyAccount);
 router.post("/player/recovery", controller.playerForgotPasswordEmail);
 router.post("/player/update", controller.playerPasswordUpdate);
 
+router.get("/player/favoriteQuizzes", controller.getFavoriteQuizzes);
+
 router.get("/player/quizFinished", controller.playerUpdatePlayedQuiz);
 
 router.post("/player/addQuizToFavorites", controller.addQuizToFavorites);

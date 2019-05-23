@@ -307,3 +307,23 @@ module.exports.removeQuizToFavorites = (req, res, next) => {
         }
     });
 };
+
+module.exports.getFavoriteQuizzes = (req, res, next) => {
+    let { playerId, limit, page } = req.query;
+
+    if (!playerId) {
+        return res.status(400).send({ message: "Provide the needed fields." });
+    }
+
+    Player.findById(playerId, "playedQuizzes")
+        .populate("playedQuizzes")
+        .limit(limit)
+        .skip(limit * (page - 1))
+        .then(player => {
+            if (player) {
+                res.status(200).send(player);
+            } else {
+                res.status(404).send({ message: "Player not found." });
+            }
+        });
+};
