@@ -93,7 +93,7 @@ module.exports.playerLogin = (req, res, next) => {
             if (player.isBanned) {
                 res.status(418).send({ message: "Your account has been banned." });
             }
-            if (true) {
+            if (player.isVerified) {
                 if (bcrypt.compareSync(password, player.password)) {
                     var token = jwt.sign({ id: player._id }, config.secret, {
                         expiresIn: 3600
@@ -244,4 +244,66 @@ module.exports.playerPasswordUpdate = (req, res, next) => {
             }
         })
         .catch(err => next(err));
+};
+
+module.exports.addQuizToFavorites = (req, res, next) => {
+    let { playerId, quizId } = req.query;
+
+    if (!playerId || !quizId) {
+        return res.status(400).send({ message: "Provide the needed fields." });
+    }
+
+    Player.findById(playerId).then(player => {
+        if (player) {
+            Quiz.findById(quizId)
+                .then(quiz => {
+                    if (quiz) {
+                        player.favoriteQuizzes.push(quiz);
+
+                        player
+                            .save()
+                            .then(() => {
+                                res.status(200).send("save succ");
+                            })
+                            .catch(err => next(err));
+                    } else {
+                        res.status(404).send({ message: "Quiz not found." });
+                    }
+                })
+                .catch(err => next(err));
+        } else {
+            res.status(404).send({ message: "Player not found." });
+        }
+    });
+};
+
+module.exports.removeQuizToFavorites = (req, res, next) => {
+    let { playerId, quizId } = req.query;
+
+    if (!playerId || !quizId) {
+        return res.status(400).send({ message: "Provide the needed fields." });
+    }
+
+    Player.findById(playerId).then(player => {
+        if (player) {
+            Quiz.findById(quizId)
+                .then(quiz => {
+                    if (quiz) {
+                        player.favoriteQuizzes.pop(quiz);
+
+                        player
+                            .save()
+                            .then(() => {
+                                res.status(200).send("remove succ");
+                            })
+                            .catch(err => next(err));
+                    } else {
+                        res.status(404).send({ message: "Quiz not found." });
+                    }
+                })
+                .catch(err => next(err));
+        } else {
+            res.status(404).send({ message: "Player not found." });
+        }
+    });
 };

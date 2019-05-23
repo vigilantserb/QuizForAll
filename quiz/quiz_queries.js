@@ -36,3 +36,19 @@ module.exports.getQuizzesByCriteriaQuery = (limit, currentPage, questionCount, b
             );
     });
 };
+
+module.exports.randomQuizzesQuery = (limit, page) => {
+    let min = 0;
+    let max = 99;
+    let array = [];
+    for (let i = 0; i < limit; i++) {
+        let rnd = Math.floor(Math.random() * (+max - +min)) + +min;
+        array.push(
+            Quiz.find({}, "quizName quizType numberOfPlays ratings")
+                .skip(rnd + page)
+                .limit(1)
+                .then()
+        );
+    }
+    return array;
+};

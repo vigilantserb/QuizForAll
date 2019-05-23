@@ -2,12 +2,14 @@ const Quiz = require("./quiz_model");
 const Question = require("../question/question_model");
 const Player = require("../player/player_model");
 
+const _ = require("lodash");
+
 let questionCount = 10,
     buttonCount = 10;
 
 const { generatePageButtons } = require("../tools/utils");
 const { sortByKey } = require("../tools/sort");
-const { getQuizzesByCriteriaQuery } = require("./quiz_queries");
+const { getQuizzesByCriteriaQuery, randomQuizzesQuery } = require("./quiz_queries");
 
 module.exports.addNewQuizView = (req, res) => {
     res.render("quiz_add_quiz", {
@@ -346,67 +348,24 @@ module.exports.quizLatest = (req, res, next) => {
         .skip(limit * (page - 1))
         .sort({ lastEdited: -1 })
         .then(quizzes => {
-            res.status(200).send({ data: quizzes, page });
+            res.status(200).send({ data: quizzes });
         })
         .catch(err => next(err));
 };
 
 module.exports.quizExplore = (req, res, next) => {
-    let { playerId } = req.body;
-    let limit = 10;
+    let { page, limit, playerId } = req.query;
+    limit = Number(limit);
+    page = Number(page);
 
-    Player.findById(playerId)
-        .populate("playedQuizzes")
-        .then(player => {
-            let counts = { Movies: 0, "TV Shows": 0, Geography: 0, History: 0, Mixed: 0 };
-
-            for (let i = 0; i < player.playedQuizzes.length; i++) {
-                if (!counts.hasOwnProperty(player.playedQuizzes[i].quizType)) {
-                    counts[player.playedQuizzes[i].quizType] = 1;
-                } else {
-                    counts[player.playedQuizzes[i].quizType]++;
-                }
-            }
-
-            let array = [];
-
-            for (var key in counts) {
-                if (counts.hasOwnProperty(key)) {
-                    array.push({ type: key, count: counts[key] });
-                }
-            }
-
-            array = sortByKey(array, "count");
-
-            let exploreQuizzes = [];
-            let typeCount = 0;
-
-            array.forEach((type, index, array) => {
-                Quiz.find({ quizType: type.type }, "quizName quizType")
-                    .limit(limit)
-                    .then(quizzes => {
-                        typeCount++;
-                        quizzes.forEach(quiz => {
-                            exploreQuizzes.push(quiz);
-                        });
-                        if (typeCount === array.length) {
-                            typeCount = 0;
-                            exploreQuizzes.forEach((quiz, index, array) => {
-                                typeCount++;
-                                player.playedQuizzes.forEach(playedQuiz => {
-                                    if (JSON.stringify(playedQuiz._id) === JSON.stringify(quiz._id)) {
-                                        array.splice(index, 1);
-                                    }
-                                });
-                                if (typeCount === array.length) {
-                                    res.send(exploreQuizzes);
-                                }
-                            });
-                        }
-                    });
-            });
-        })
-        .catch(err => next(err));
+    Player.findById(playerId).then(player => {
+        if (player) {
+            let quizzes = randomQuizzesQuery(limit, page);
+            Promise.all(quizzes).then(data => res.send({ data }));
+        } else {
+            res.status(404).send();
+        }
+    });
 };
 
 module.exports.quizAddRating = (req, res, next) => {

@@ -13,4 +13,7 @@ router.post("/player/update", controller.playerPasswordUpdate);
 
 router.get("/player/quizFinished", controller.playerUpdatePlayedQuiz);
 
+router.post("/player/addQuizToFavorites", controller.addQuizToFavorites);
+router.post("/player/removeQuizFromFavorites", controller.removeQuizToFavorites);
+
 module.exports = router;

@@ -18,6 +18,7 @@ const app = express();
 require("./config/passport")(passport);
 
 const db = require("./config/keys").mongoURI;
+mongoose.Promise = Promise;
 mongoose
     .connect(db, { useNewUrlParser: true })
     .then(() => console.log("MongoDB Connected"))
