@@ -316,13 +316,13 @@ module.exports.getFavoriteQuizzes = (req, res, next) => {
         return res.status(400).send({ message: "Provide the needed fields." });
     }
 
-    Player.find({ _id: playerId }, "playedQuizzes")
-        .populate("playedQuizzes")
+    Player.findById({ _id: playerId }, "favoriteQuizzes")
+        .populate("favoriteQuizzes")
         .limit(limit)
         .skip(limit * (page - 1))
-        .then(data => {
-            if (data) {
-                res.status(200).send({ data });
+        .then(player => {
+            if (player) {
+                res.status(200).send({ data: player.favoriteQuizzes });
             } else {
                 res.status(404).send({ message: "Player not found." });
             }
