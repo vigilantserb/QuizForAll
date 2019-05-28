@@ -6,7 +6,7 @@ module.exports = {
         let token = jwt.sign({ email: email }, require("../config/keys").secret, {
             expiresIn: 3600
         });
-        let link = `http://localhost:3000/user/reset_password/${token}`;
+        let link = `https://safe-sea-80392.herokuapp.com/user/reset_password/${token}`;
 
         let transporter = nodemailer.createTransport({
             service: "gmail",
@@ -33,7 +33,7 @@ module.exports = {
             expiresIn: 3600
         });
         console.log(token);
-        let link = `http://localhost:3000/user/confirm_account/${token}`;
+        let link = `https://safe-sea-80392.herokuapp.com/user/confirm_account/${token}`;
 
         let transporter = nodemailer.createTransport({
             service: "gmail",
@@ -60,7 +60,7 @@ module.exports = {
             expiresIn: 3600
         });
         console.log(token);
-        let link = `http://localhost:3000/mobile/player/verify/${token}`;
+        let link = `https://safe-sea-80392.herokuapp.com/mobile/player/verify/${token}`;
 
         let transporter = nodemailer.createTransport({
             service: "gmail",
