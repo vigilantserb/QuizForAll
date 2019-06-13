@@ -131,7 +131,8 @@ module.exports.registerMongoose = (req, res, next) => {
             lastname,
             email,
             password,
-            password2
+            password2,
+            style: "style.css"
         });
     } else {
         User.findOne({ email: email })
@@ -144,7 +145,8 @@ module.exports.registerMongoose = (req, res, next) => {
                         lastname,
                         email,
                         password,
-                        password2
+                        password2,
+                        style: "style.css"
                     });
                 } else {
                     const newUser = new User({
